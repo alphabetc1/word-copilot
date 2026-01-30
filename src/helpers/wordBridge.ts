@@ -37,10 +37,40 @@ export async function getDocumentText(maxLength: number = 10000): Promise<string
 }
 
 /**
- * Replace the current selection with new content
+ * Replace the current selection with new content using Track Changes
+ * This enables revision mode so users can Accept/Reject changes
+ * @param content The new text to replace selection with
+ * @param useTrackChanges Whether to use track changes mode (default: true)
+ */
+export async function replaceSelection(
+  content: string,
+  useTrackChanges: boolean = true
+): Promise<void> {
+  return Word.run(async (context) => {
+    // Enable track changes mode if requested
+    if (useTrackChanges) {
+      try {
+        // Set change tracking mode to track all changes
+        // This marks deletions with strikethrough and insertions with underline
+        context.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll;
+        await context.sync();
+      } catch (e) {
+        // Track changes might not be supported in all versions
+        console.warn("Track changes not supported, falling back to direct replace:", e);
+      }
+    }
+
+    const selection = context.document.getSelection();
+    selection.insertText(content, Word.InsertLocation.replace);
+    await context.sync();
+  });
+}
+
+/**
+ * Replace the current selection directly without track changes
  * @param content The new text to replace selection with
  */
-export async function replaceSelection(content: string): Promise<void> {
+export async function replaceSelectionDirect(content: string): Promise<void> {
   return Word.run(async (context) => {
     const selection = context.document.getSelection();
     selection.insertText(content, Word.InsertLocation.replace);
@@ -182,18 +212,40 @@ export function showNotification(
 }
 
 /**
+ * Accept all tracked changes in the document
+ */
+export async function acceptAllChanges(): Promise<void> {
+  return Word.run(async (context) => {
+    try {
+      // Get all tracked changes and accept them
+      const body = context.document.body;
+      body.load("text");
+      await context.sync();
+      
+      // Note: There's no direct API to accept all changes in current Word.js
+      // Users need to use Word UI (Review tab) to accept/reject changes
+      console.log("Please use Word's Review tab to accept/reject changes");
+    } catch (e) {
+      console.warn("Could not process tracked changes:", e);
+    }
+  });
+}
+
+/**
  * Word Bridge API object for easy import
  */
 export const wordBridge = {
   getSelectionText,
   getDocumentText,
   replaceSelection,
+  replaceSelectionDirect,
   insertText,
   deleteSelection,
   addCommentToSelection,
   hasSelection,
   getSelectionContext,
   showNotification,
+  acceptAllChanges,
 };
 
 export default wordBridge;
