@@ -4,6 +4,7 @@
   "description": "Word Copilot - AI-powered writing assistant for Microsoft Word",
   "main": "index.js",
   "scripts": {
+    "postinstall": "node scripts/generate-icons.js",
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "dev": "webpack serve --mode development",

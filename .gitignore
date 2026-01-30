@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Generated icons (recreated by npm install)
+assets/icon-*.png
+
 # Build output
 dist/
 

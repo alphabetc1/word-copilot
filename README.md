@@ -53,124 +53,78 @@
 
 ## 快速开始
 
-### 1. 安装依赖
-
 ```bash
+# 1. 安装依赖（图标会自动生成）
 npm install
-```
 
-### 2. 准备图标
-
-在 `assets/` 目录下添加以下图标文件：
-- `icon-16.png` (16x16)
-- `icon-32.png` (32x32)
-- `icon-64.png` (64x64)
-- `icon-80.png` (80x80)
-
-### 3. 开发模式运行
-
-```bash
+# 2. 启动开发服务器
 npm run dev
+
+# 3. 在 Word 中加载插件（见下方说明）
 ```
 
-这将在 `https://localhost:3000` 启动开发服务器。
+### 在 Word 中加载插件
 
-### 4. 在 Word 中加载插件
+**Windows / Mac 桌面版**
+1. 打开 Word → 文件 → 选项 → 信任中心 → 信任中心设置 → 受信任的加载项目录
+2. 添加项目根目录路径，勾选"显示在菜单中"
+3. 重启 Word → 插入 → 获取加载项 → 共享文件夹 → 选择 Word Copilot
 
-#### Windows / Mac 桌面版
-1. 打开 Word
-2. 文件 → 选项 → 信任中心 → 信任中心设置 → 受信任的加载项目录
-3. 添加 manifest.xml 所在目录的路径
-4. 重启 Word
-5. 插入 → 获取加载项 → 共享文件夹 → 选择 Word Copilot
+**Word Online**
+1. 在 Word Online 中：插入 → 获取加载项 → 上传我的加载项
+2. 上传 `manifest.xml` 文件
 
-#### Word Online
-1. 上传 manifest.xml 到 OneDrive
-2. 在 Word Online 中：插入 → 获取加载项 → 上传我的加载项
-3. 选择 manifest.xml 文件
+### 配置 API
 
-### 5. 配置 API
-
-1. 打开插件侧边栏
-2. 切换到「设置」标签
-3. 填写：
+1. 打开插件侧边栏，切换到「设置」标签
+2. 填写：
    - **Base URL**: 例如 `https://api.openai.com`
    - **API Key**: 你的 API 密钥
    - **模型名称**: 例如 `gpt-4o`
-4. 点击「保存设置」
+3. 点击「保存设置」
 
 ## 使用方法
 
 ### 侧边栏对话
 
-1. 在 Word 中选中要处理的文本
-2. 打开 Word Copilot 侧边栏
-3. 在输入框中输入指令，例如：
+1. 选中要处理的文本
+2. 在侧边栏输入指令，例如：
    - "润色这段话"
    - "翻译成英文"
    - "让这段话更简洁"
-   - "这段话有什么问题？"
-4. 点击发送，AI 会自动执行相应操作
+3. AI 会自动执行相应操作
 
 ### 右键菜单
 
-1. 选中文本
-2. 右键点击，选择「Copilot」菜单
-3. 选择操作：
-   - **润色选中内容**：改进表达
-   - **翻译选中内容**：中英互译
-   - **添加批注建议**：不修改原文，添加改进建议
+选中文本 → 右键 → Copilot 菜单：
+- **润色选中内容**
+- **翻译选中内容**
+- **添加批注建议**
 
-### 用户规则
-
-在设置中配置你的写作偏好：
-- **风格**：学术 / 正式 / 商务 / 口语 / 创意
-- **语气**：严谨 / 中性 / 亲切
-- **长度**：尽量简短 / 正常 / 详细
-- **语言**：优先中文 / 优先英文 / 跟随文档语言
-- **其他规则**：自由文本，例如"避免第一人称"
-
-## 工具定义
-
-插件通过以下工具与 Word 文档交互：
-
-| 工具名 | 功能 | 参数 |
-|--------|------|------|
-| `replace_selection` | 替换选中内容 | `content`, `comment?` |
-| `insert_text` | 插入文本 | `position`, `content`, `comment?` |
-| `delete_selection` | 删除选中内容 | `comment?` |
-| `add_comment_to_selection` | 添加批注 | `comment` |
-
-## 构建生产版本
-
-```bash
-npm run build
-```
-
-输出目录：`dist/`
 
 ## 开发命令
 
 ```bash
-npm run dev          # 启动开发服务器
+npm run dev          # 启动开发服务器 (https://localhost:3000)
 npm run build        # 构建生产版本
-npm run build:dev    # 构建开发版本
-npm run lint         # 运行 ESLint
+npm run lint         # 代码检查
 npm run validate     # 验证 manifest.xml
 ```
+
+## 工具定义
+
+| 工具 | 功能 |
+|------|------|
+| `replace_selection` | 替换选中内容 |
+| `insert_text` | 在指定位置插入文本 |
+| `delete_selection` | 删除选中内容 |
+| `add_comment_to_selection` | 添加批注 |
 
 ## 兼容性
 
 - Microsoft Word 2016+ (Windows/Mac)
 - Microsoft Word Online
 - 需要 Word API 1.1+
-
-## 注意事项
-
-1. 开发时需要 HTTPS，webpack-dev-server 会自动生成自签名证书
-2. 首次在浏览器/Word 中加载时可能需要信任证书
-3. API Key 存储在 localStorage，不要在公共设备上使用
-4. 大文档可能需要较长处理时间，请耐心等待
 
 ## License
 
