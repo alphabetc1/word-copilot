@@ -9,47 +9,6 @@
 - **用户规则配置**：自定义写作风格、语气、长度、语言偏好
 - **Function Calling**：通过工具调用机制直接操作 Word 文档
 
-## 技术栈
-
-- Office.js (Word JavaScript API)
-- React 18 + TypeScript
-- Fluent UI React Components
-- Webpack 5
-
-## 项目结构
-
-```
-/word-copilot
-├── manifest.xml                    # Office Add-in 清单文件
-├── package.json                    # 依赖配置
-├── tsconfig.json                   # TypeScript 配置
-├── webpack.config.js               # Webpack 打包配置
-├── src/
-│   ├── taskpane/                   # 侧边栏 UI
-│   │   ├── index.html
-│   │   ├── index.tsx
-│   │   ├── App.tsx
-│   │   ├── styles.css
-│   │   └── components/
-│   │       ├── ChatPanel.tsx       # 聊天面板
-│   │       ├── SettingsPanel.tsx   # 设置面板
-│   │       └── MessageItem.tsx     # 消息组件
-│   ├── commands/                   # 右键菜单命令
-│   │   ├── commands.html
-│   │   └── commands.ts
-│   ├── helpers/                    # 核心模块
-│   │   ├── llmClient.ts           # 大模型 API 客户端
-│   │   ├── wordBridge.ts          # Word 文档操作封装
-│   │   ├── contextManager.ts      # 对话上下文管理
-│   │   ├── settings.ts            # 设置存取
-│   │   ├── toolExecutor.ts        # 工具执行器
-│   │   └── systemPrompt.ts        # 系统提示词
-│   └── types/                      # 类型定义
-│       ├── llm.ts
-│       ├── tools.ts
-│       └── settings.ts
-└── assets/                         # 图标资源
-```
 
 ## 快速开始
 
@@ -120,6 +79,42 @@ npm install && npm run dev
 - **添加批注建议**
 
 
+## 项目结构
+
+```
+/word-copilot
+├── manifest.xml                    # Office Add-in 清单文件
+├── package.json                    # 依赖配置
+├── tsconfig.json                   # TypeScript 配置
+├── webpack.config.js               # Webpack 打包配置
+├── src/
+│   ├── taskpane/                   # 侧边栏 UI
+│   │   ├── index.html
+│   │   ├── index.tsx
+│   │   ├── App.tsx
+│   │   ├── styles.css
+│   │   └── components/
+│   │       ├── ChatPanel.tsx       # 聊天面板
+│   │       ├── SettingsPanel.tsx   # 设置面板
+│   │       └── MessageItem.tsx     # 消息组件
+│   ├── commands/                   # 右键菜单命令
+│   │   ├── commands.html
+│   │   └── commands.ts
+│   ├── helpers/                    # 核心模块
+│   │   ├── llmClient.ts           # 大模型 API 客户端
+│   │   ├── wordBridge.ts          # Word 文档操作封装
+│   │   ├── contextManager.ts      # 对话上下文管理
+│   │   ├── settings.ts            # 设置存取
+│   │   ├── toolExecutor.ts        # 工具执行器
+│   │   └── systemPrompt.ts        # 系统提示词
+│   └── types/                      # 类型定义
+│       ├── llm.ts
+│       ├── tools.ts
+│       └── settings.ts
+└── assets/                         # 图标资源
+```
+
+
 ## 开发命令
 
 ```bash
@@ -129,14 +124,6 @@ npm run lint         # 代码检查
 npm run validate     # 验证 manifest.xml
 ```
 
-## 工具定义
-
-| 工具 | 功能 |
-|------|------|
-| `replace_selection` | 替换选中内容 |
-| `insert_text` | 在指定位置插入文本 |
-| `delete_selection` | 删除选中内容 |
-| `add_comment_to_selection` | 添加批注 |
 
 ## 兼容性
 
@@ -146,4 +133,4 @@ npm run validate     # 验证 manifest.xml
 
 ## License
 
-MIT
+Licensed under the [Apache License, Version 2.0](./LICENSE).
