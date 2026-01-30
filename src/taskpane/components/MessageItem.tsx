@@ -1,5 +1,6 @@
 import * as React from "react";
 import { DisplayMessage } from "../../types/llm";
+import MarkdownRenderer from "./MarkdownRenderer";
 
 interface MessageItemProps {
   message: DisplayMessage;
@@ -25,9 +26,18 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
     classNames.push("error");
   }
 
+  // Use Markdown renderer for assistant messages
+  const shouldRenderMarkdown = role === "assistant" && !isError;
+
   return (
     <div className={classNames.join(" ")}>
-      <div className="content">{content}</div>
+      <div className="content">
+        {shouldRenderMarkdown ? (
+          <MarkdownRenderer content={content} />
+        ) : (
+          content
+        )}
+      </div>
       <div className="timestamp">{formatTime(timestamp)}</div>
     </div>
   );
