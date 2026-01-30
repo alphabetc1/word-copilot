@@ -19,11 +19,22 @@ interface ChatPanelProps {
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
-  const [messages, setMessages] = useState<DisplayMessage[]>([]);
+  const contextManagerRef = useRef<ContextManager>(getContextManager());
+  // Initialize messages from context manager to persist across tab switches
+  const [messages, setMessages] = useState<DisplayMessage[]>(
+    () => contextManagerRef.current.getDisplayMessages()
+  );
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const contextManagerRef = useRef<ContextManager>(getContextManager());
+
+  // Restore messages when component mounts (e.g., after tab switch)
+  useEffect(() => {
+    const savedMessages = contextManagerRef.current.getDisplayMessages();
+    if (savedMessages.length > 0) {
+      setMessages(savedMessages);
+    }
+  }, []);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
