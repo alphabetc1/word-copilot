@@ -25,13 +25,72 @@ interface SettingsPanelProps {
   onSaved?: () => void;
 }
 
+type StatusType = "success" | "error" | "testing" | "saving";
+
+interface Status {
+  type: StatusType;
+  message: string;
+}
+
+/**
+ * Test API connection by sending a simple request
+ */
+async function testConnection(config: ModelConfig): Promise<{ success: boolean; error?: string }> {
+  if (!config.baseUrl || !config.apiKey || !config.model) {
+    return { success: false, error: "请填写完整的 URL、API Key 和模型名称" };
+  }
+
+  // Build endpoint
+  let url = config.baseUrl.replace(/\/+$/, "");
+  if (url.includes("/chat/completions")) {
+    // URL already contains path
+  } else if (url.endsWith("/v1")) {
+    url = `${url}/chat/completions`;
+  } else {
+    url = `${url}/v1/chat/completions`;
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages: [{ role: "user", content: "Hi" }],
+        max_tokens: 5,
+      }),
+    });
+
+    if (response.ok) {
+      return { success: true };
+    }
+
+    // Try to get error message
+    let errorMsg = `HTTP ${response.status}`;
+    try {
+      const data = await response.json();
+      if (data?.error?.message) {
+        errorMsg = data.error.message;
+      }
+    } catch {
+      // Ignore parse errors
+    }
+
+    return { success: false, error: errorMsg };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "网络错误";
+    return { success: false, error: msg };
+  }
+}
+
 const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
   const [modelConfig, setModelConfig] = useState<ModelConfig>(DEFAULT_MODEL_CONFIG);
   const [userRules, setUserRules] = useState<UserRules>(DEFAULT_USER_RULES);
-  const [status, setStatus] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
+  const [status, setStatus] = useState<Status | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Load settings on mount
   useEffect(() => {
@@ -39,19 +98,41 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
     setUserRules(loadUserRules());
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (isProcessing) return;
+
+    setIsProcessing(true);
+    setStatus({ type: "testing", message: "正在测试 API 连接..." });
+
+    // Test connection first
+    const testResult = await testConnection(modelConfig);
+
+    if (!testResult.success) {
+      setStatus({
+        type: "error",
+        message: `连接失败: ${testResult.error} 请检查 API Key 和 Base URL`,
+      });
+      setIsProcessing(false);
+      return;
+    }
+
+    // Connection successful, save settings
+    setStatus({ type: "saving", message: "正在保存设置..." });
+
     const configSaved = saveModelConfig(modelConfig);
     const rulesSaved = saveUserRules(userRules);
 
     if (configSaved && rulesSaved) {
-      setStatus({ type: "success", message: "设置已保存" });
+      setStatus({ type: "success", message: "✓ 连接成功，设置已保存！" });
       onSaved?.();
+
+      // Clear success status after 3 seconds
+      setTimeout(() => setStatus(null), 3000);
     } else {
       setStatus({ type: "error", message: "保存失败，请重试" });
     }
 
-    // Clear status after 3 seconds
-    setTimeout(() => setStatus(null), 3000);
+    setIsProcessing(false);
   };
 
   const renderRadioGroup = <T extends string>(
@@ -81,6 +162,21 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
     );
   };
 
+  const getStatusClassName = () => {
+    if (!status) return "";
+    switch (status.type) {
+      case "success":
+        return "status-message success";
+      case "error":
+        return "status-message error";
+      case "testing":
+      case "saving":
+        return "status-message testing";
+      default:
+        return "status-message";
+    }
+  };
+
   return (
     <div className="settings-panel">
       {/* Model Configuration */}
@@ -96,6 +192,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
               setModelConfig({ ...modelConfig, baseUrl: e.target.value })
             }
             placeholder="https://api.openai.com"
+            disabled={isProcessing}
           />
         </div>
 
@@ -108,6 +205,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
               setModelConfig({ ...modelConfig, apiKey: e.target.value })
             }
             placeholder="sk-..."
+            disabled={isProcessing}
           />
         </div>
 
@@ -119,7 +217,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
             onChange={(e) =>
               setModelConfig({ ...modelConfig, model: e.target.value })
             }
-            placeholder="gpt-4o"
+            placeholder="gpt-4o / qwen-plus"
+            disabled={isProcessing}
           />
         </div>
       </section>
@@ -176,18 +275,35 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
               setUserRules({ ...userRules, custom: e.target.value })
             }
             placeholder="例如：避免使用第一人称；不使用网络流行语；专业术语需保留英文..."
+            disabled={isProcessing}
           />
         </div>
       </section>
 
       {/* Save Button */}
-      <button className="save-button" onClick={handleSave}>
-        保存设置
+      <button
+        className={`save-button ${isProcessing ? "processing" : ""}`}
+        onClick={handleSave}
+        disabled={isProcessing}
+      >
+        {isProcessing ? (
+          <>
+            <span className="button-spinner" />
+            {status?.type === "testing" ? "测试连接中..." : "保存中..."}
+          </>
+        ) : (
+          "保存设置"
+        )}
       </button>
 
       {/* Status Message */}
       {status && (
-        <div className={`status-message ${status.type}`}>{status.message}</div>
+        <div className={getStatusClassName()}>
+          {(status.type === "testing" || status.type === "saving") && (
+            <span className="status-spinner" />
+          )}
+          {status.message}
+        </div>
       )}
     </div>
   );

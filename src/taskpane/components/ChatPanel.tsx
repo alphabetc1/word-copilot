@@ -95,9 +95,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         throw new Error(result.error || "Failed to get response from AI");
       }
 
-      // Add assistant message to context
-      contextManager.addMessage(result.message);
-
       // Handle tool calls if present
       if (hasToolCalls(result.message)) {
         const toolCalls = result.message.tool_calls!;
@@ -116,10 +113,25 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
         // Add natural language response if present
         if (result.message.content) {
+          // Only add text content to context (without tool_calls to avoid API errors)
+          contextManager.addMessage({
+            role: "assistant",
+            content: result.message.content,
+          });
           contextManager.addDisplayMessage("assistant", result.message.content);
+        } else {
+          // Add a summary of what was done to context
+          contextManager.addMessage({
+            role: "assistant",
+            content: `[已执行操作: ${toolResultText}]`,
+          });
         }
       } else if (result.message.content) {
-        // No tool calls, just add the response
+        // No tool calls, add the response to context and display
+        contextManager.addMessage({
+          role: "assistant",
+          content: result.message.content,
+        });
         contextManager.addDisplayMessage("assistant", result.message.content);
       }
 
