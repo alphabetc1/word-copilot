@@ -53,26 +53,44 @@
 
 ## 快速开始
 
+### Mac
+
 ```bash
-# 1. 安装依赖（图标会自动生成）
+# 1. 安装依赖
+npm install
+
+# 2. 安装 HTTPS 证书（首次需要，会要求输入密码）
+npm run dev:certs
+
+# 3. Sideload 插件到 Word
+npm run sideload:mac
+
+# 4. 启动开发服务器
+npm run dev
+
+# 5. 完全退出 Word (Cmd+Q)，重新打开
+# 6. 插入 → 加载项 → 我的加载项 → 选择 Word Copilot
+```
+
+### Windows
+
+```bash
+# 1. 安装依赖
 npm install
 
 # 2. 启动开发服务器
 npm run dev
 
-# 3. 在 Word 中加载插件（见下方说明）
+# 3. 在 Word 中：插入 → 获取加载项 → 我的加载项 → 上传我的加载项
+# 4. 选择项目中的 manifest.xml 文件
 ```
 
-### 在 Word 中加载插件
+### Word Online
 
-**Windows / Mac 桌面版**
-1. 打开 Word → 文件 → 选项 → 信任中心 → 信任中心设置 → 受信任的加载项目录
-2. 添加项目根目录路径，勾选"显示在菜单中"
-3. 重启 Word → 插入 → 获取加载项 → 共享文件夹 → 选择 Word Copilot
-
-**Word Online**
-1. 在 Word Online 中：插入 → 获取加载项 → 上传我的加载项
-2. 上传 `manifest.xml` 文件
+```bash
+npm install && npm run dev
+# 然后在 Word Online: 插入 → 加载项 → 上传我的加载项 → 选择 manifest.xml
+```
 
 ### 配置 API
 

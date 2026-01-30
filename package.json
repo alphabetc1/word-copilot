@@ -8,6 +8,8 @@
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "dev": "webpack serve --mode development",
+    "dev:certs": "npx office-addin-dev-certs install",
+    "sideload:mac": "node scripts/sideload-mac.js",
     "start": "office-addin-debugging start manifest.xml",
     "stop": "office-addin-debugging stop manifest.xml",
     "validate": "office-addin-manifest validate manifest.xml",

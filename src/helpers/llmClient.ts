@@ -48,8 +48,19 @@ const DEFAULT_TIMEOUT = 60000;
  */
 function buildEndpoint(baseUrl: string): string {
   // Remove trailing slash if present
-  const url = baseUrl.replace(/\/+$/, "");
-  // Add the chat completions path
+  let url = baseUrl.replace(/\/+$/, "");
+  
+  // If URL already contains the path, don't add it again
+  if (url.includes("/chat/completions")) {
+    return url;
+  }
+  
+  // If URL ends with /v1, just add /chat/completions
+  if (url.endsWith("/v1")) {
+    return `${url}/chat/completions`;
+  }
+  
+  // Otherwise add the full path
   return `${url}/v1/chat/completions`;
 }
 
@@ -96,8 +107,8 @@ export async function sendChat(params: SendChatParams): Promise<ChatResult> {
     ...messages,
   ];
 
-  // Build request body
-  const requestBody: ChatCompletionRequest = {
+  // Build request body - use type assertion for flexibility with different APIs
+  const requestBody: Record<string, unknown> = {
     model: config.model,
     messages: fullMessages,
     temperature,
@@ -105,13 +116,15 @@ export async function sendChat(params: SendChatParams): Promise<ChatResult> {
     stream: false,
   };
 
-  // Add tools if provided
+  // Add tools if provided (some models may not support this)
   if (tools && tools.length > 0) {
     requestBody.tools = tools;
     requestBody.tool_choice = toolChoice;
   }
 
   const endpoint = buildEndpoint(config.baseUrl);
+  console.log("Sending request to:", endpoint);
+  console.log("Request body (truncated):", JSON.stringify(requestBody, null, 2).substring(0, 500));
   const { controller, timeoutId } = createTimeoutController(DEFAULT_TIMEOUT);
 
   try {
@@ -129,10 +142,25 @@ export async function sendChat(params: SendChatParams): Promise<ChatResult> {
 
     // Handle non-OK responses
     if (!response.ok) {
-      const errorData = (await response.json().catch(() => null)) as LLMErrorResponse | null;
-      const errorMessage =
-        errorData?.error?.message ||
-        `API request failed with status ${response.status}`;
+      let errorMessage = `API request failed with status ${response.status}`;
+      try {
+        const errorText = await response.text();
+        // Try to parse as JSON
+        try {
+          const errorData = JSON.parse(errorText) as LLMErrorResponse;
+          if (errorData?.error?.message) {
+            errorMessage = errorData.error.message;
+          }
+        } catch {
+          // If not JSON, use the raw text (truncated)
+          if (errorText) {
+            errorMessage = errorText.substring(0, 200);
+          }
+        }
+      } catch {
+        // Ignore parse errors
+      }
+      console.error("API Error:", errorMessage, "Endpoint:", endpoint);
       return { success: false, error: errorMessage };
     }
 

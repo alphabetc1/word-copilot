@@ -71,13 +71,25 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
       setMessages([...contextManager.getDisplayMessages()]);
 
       // Send to LLM
-      const result = await sendChat({
+      // First try with tools, if it fails with 400, retry without tools
+      let result = await sendChat({
         config,
         systemPrompt: SYSTEM_PROMPT,
         messages: contextManager.getMessages(),
         tools: TOOL_DEFINITIONS,
         toolChoice: "auto",
       });
+
+      // If 400 error, might be tools not supported, retry without tools
+      if (!result.success && result.error?.includes("400")) {
+        console.warn("Retrying without tools due to 400 error");
+        result = await sendChat({
+          config,
+          systemPrompt: SYSTEM_PROMPT,
+          messages: contextManager.getMessages(),
+          // No tools - for models that don't support function calling
+        });
+      }
 
       if (!result.success || !result.message) {
         throw new Error(result.error || "Failed to get response from AI");

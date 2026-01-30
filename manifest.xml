@@ -127,8 +127,7 @@
                   <bt:Image size="80" resid="Icon.80x80"/>
                 </Icon>
                 <Items>
-                  <!-- Polish Context Menu Item -->
-                  <Control xsi:type="Button" id="ContextPolishButton">
+                  <Item id="ContextPolishButton">
                     <Label resid="PolishButton.Label"/>
                     <Supertip>
                       <Title resid="PolishButton.Label"/>
@@ -142,10 +141,8 @@
                     <Action xsi:type="ExecuteFunction">
                       <FunctionName>polishSelection</FunctionName>
                     </Action>
-                  </Control>
-
-                  <!-- Translate Context Menu Item -->
-                  <Control xsi:type="Button" id="ContextTranslateButton">
+                  </Item>
+                  <Item id="ContextTranslateButton">
                     <Label resid="TranslateButton.Label"/>
                     <Supertip>
                       <Title resid="TranslateButton.Label"/>
@@ -159,10 +156,8 @@
                     <Action xsi:type="ExecuteFunction">
                       <FunctionName>translateSelection</FunctionName>
                     </Action>
-                  </Control>
-
-                  <!-- Comment Context Menu Item -->
-                  <Control xsi:type="Button" id="ContextCommentButton">
+                  </Item>
+                  <Item id="ContextCommentButton">
                     <Label resid="CommentButton.Label"/>
                     <Supertip>
                       <Title resid="CommentButton.Label"/>
@@ -176,7 +171,7 @@
                     <Action xsi:type="ExecuteFunction">
                       <FunctionName>addCommentSuggestion</FunctionName>
                     </Action>
-                  </Control>
+                  </Item>
                 </Items>
               </Control>
             </OfficeMenu>
