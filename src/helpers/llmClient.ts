@@ -6,7 +6,6 @@ import {
   ChatMessage,
   LLMResponse,
   LLMErrorResponse,
-  ChatCompletionRequest,
 } from "../types/llm";
 import { ToolDefinition } from "../types/tools";
 import { ModelConfig } from "../types/settings";
@@ -50,7 +49,7 @@ const DEFAULT_TIMEOUT = 60000;
  */
 function buildEndpoint(baseUrl: string): string {
   // Remove trailing slash if present
-  let url = baseUrl.replace(/\/+$/, "");
+  const url = baseUrl.replace(/\/+$/, "");
   
   // If URL already contains the path, don't add it again
   if (url.includes("/chat/completions")) {
