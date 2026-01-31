@@ -1,17 +1,18 @@
 import * as React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { sendChat } from "../../helpers/llmClient";
 import { loadModelConfig, loadUserRules } from "../../helpers/settings";
 import { insertText } from "../../helpers/wordBridge";
+import { t } from "../../helpers/i18n";
 
 // Plan workflow steps
 type PlanStep = "questions" | "outline" | "sections";
 
 interface ClarifyingQuestion {
   id: string;
-  question: string;
+  questionKey: keyof ReturnType<typeof t>;
+  placeholderKey: keyof ReturnType<typeof t>;
   answer: string;
-  placeholder: string;
 }
 
 interface OutlineSection {
@@ -28,42 +29,35 @@ interface PlanPanelProps {
 }
 
 // Default clarifying questions for long document writing
-const DEFAULT_QUESTIONS: ClarifyingQuestion[] = [
-  {
-    id: "title",
-    question: "文档标题/项目名称",
-    answer: "",
-    placeholder: "例如：基于深度学习的医学影像分析研究",
-  },
-  {
-    id: "objective",
-    question: "主要目标/核心内容",
-    answer: "",
-    placeholder: "简述你想要实现的目标",
-  },
-  {
-    id: "audience",
-    question: "目标读者/对象",
-    answer: "",
-    placeholder: "例如：基金评审专家、学术期刊编辑",
-  },
-  {
-    id: "length",
-    question: "预期字数/篇幅",
-    answer: "",
-    placeholder: "例如：3000字、10页",
-  },
-  {
-    id: "extra",
-    question: "其他要求或背景信息",
-    answer: "",
-    placeholder: "任何额外的说明或特殊要求",
-  },
+const QUESTION_KEYS: Array<{
+  id: string;
+  questionKey: keyof ReturnType<typeof t>;
+  placeholderKey: keyof ReturnType<typeof t>;
+}> = [
+  { id: "title", questionKey: "planDocTitle", placeholderKey: "planDocTitlePlaceholder" },
+  { id: "objective", questionKey: "planObjective", placeholderKey: "planObjectivePlaceholder" },
+  { id: "audience", questionKey: "planAudience", placeholderKey: "planAudiencePlaceholder" },
+  { id: "length", questionKey: "planLength", placeholderKey: "planLengthPlaceholder" },
+  { id: "extra", questionKey: "planExtra", placeholderKey: "planExtraPlaceholder" },
 ];
 
 const PlanPanel: React.FC<PlanPanelProps> = ({ isConfigured }) => {
+  const i18n = t();
+
+  // Initialize questions with i18n keys
+  const initialQuestions = useMemo(
+    () =>
+      QUESTION_KEYS.map((q) => ({
+        id: q.id,
+        questionKey: q.questionKey,
+        placeholderKey: q.placeholderKey,
+        answer: "",
+      })),
+    []
+  );
+
   const [step, setStep] = useState<PlanStep>("questions");
-  const [questions, setQuestions] = useState<ClarifyingQuestion[]>(DEFAULT_QUESTIONS);
+  const [questions, setQuestions] = useState<ClarifyingQuestion[]>(initialQuestions);
   const [outline, setOutline] = useState<OutlineSection[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,7 +73,7 @@ const PlanPanel: React.FC<PlanPanelProps> = ({ isConfigured }) => {
   // Generate outline from questions
   const generateOutline = async () => {
     if (!isConfigured) {
-      setError("请先在设置中配置 API");
+      setError(i18n.configRequired);
       return;
     }
 
@@ -93,7 +87,7 @@ const PlanPanel: React.FC<PlanPanelProps> = ({ isConfigured }) => {
     // Build context from questions
     const context = questions
       .filter((q) => q.answer.trim())
-      .map((q) => `${q.question}: ${q.answer}`)
+      .map((q) => `${i18n[q.questionKey]}: ${q.answer}`)
       .join("\n");
 
     const prompt = `根据以下信息，生成一份详细的文档大纲。请以 JSON 格式返回，包含标题和简要说明。
@@ -123,14 +117,14 @@ ${context}
       });
 
       if (!result.success || !result.message) {
-        throw new Error(result.error || "生成大纲失败");
+        throw new Error(result.error || i18n.planOutlineFailed);
       }
 
       // Parse JSON response
       const content = result.message.content || "";
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error("无法解析大纲格式");
+        throw new Error(i18n.planOutlineFailed);
       }
 
       const parsed = JSON.parse(jsonMatch[0]);
@@ -149,9 +143,9 @@ ${context}
       setStep("outline");
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
-        setError("已取消");
+        setError(i18n.planCancelled);
       } else {
-        setError(err instanceof Error ? err.message : "生成失败");
+        setError(err instanceof Error ? err.message : i18n.planOutlineFailed);
       }
     } finally {
       setIsLoading(false);
@@ -177,7 +171,7 @@ ${context}
     // Build context
     const questionContext = questions
       .filter((q) => q.answer.trim())
-      .map((q) => `${q.question}: ${q.answer}`)
+      .map((q) => `${i18n[q.questionKey]}: ${q.answer}`)
       .join("\n");
 
     const outlineContext = outline
@@ -220,15 +214,13 @@ ${outlineContext}
       });
 
       if (!result.success || !result.message) {
-        throw new Error(result.error || "生成内容失败");
+        throw new Error(result.error || i18n.planContentFailed);
       }
 
       const content = result.message.content || "";
       setOutline((prev) =>
         prev.map((s) =>
-          s.id === sectionId
-            ? { ...s, content, status: "done" }
-            : s
+          s.id === sectionId ? { ...s, content, status: "done" } : s
         )
       );
     } catch (err) {
@@ -237,7 +229,7 @@ ${outlineContext}
           s.id === sectionId ? { ...s, status: "error" } : s
         )
       );
-      setError(err instanceof Error ? err.message : "生成失败");
+      setError(err instanceof Error ? err.message : i18n.planContentFailed);
     } finally {
       abortControllerRef.current = null;
     }
@@ -249,11 +241,10 @@ ${outlineContext}
     if (!section || !section.content) return;
 
     try {
-      // Insert title and content
       const fullContent = `\n${section.title}\n\n${section.content}\n`;
       await insertText("document_end", fullContent);
-    } catch (err) {
-      setError("插入文档失败");
+    } catch {
+      setError(i18n.planInsertFailed);
     }
   };
 
@@ -261,7 +252,7 @@ ${outlineContext}
   const insertAllSections = async () => {
     const completedSections = outline.filter((s) => s.status === "done");
     if (completedSections.length === 0) {
-      setError("没有可插入的内容");
+      setError(i18n.planNoContent);
       return;
     }
 
@@ -270,8 +261,8 @@ ${outlineContext}
         const fullContent = `\n${section.title}\n\n${section.content}\n`;
         await insertText("document_end", fullContent);
       }
-    } catch (err) {
-      setError("插入文档失败");
+    } catch {
+      setError(i18n.planInsertFailed);
     }
   };
 
@@ -295,7 +286,7 @@ ${outlineContext}
   // Reset to start
   const handleReset = () => {
     setStep("questions");
-    setQuestions(DEFAULT_QUESTIONS);
+    setQuestions(initialQuestions);
     setOutline([]);
     setError(null);
   };
@@ -303,19 +294,17 @@ ${outlineContext}
   // Render based on current step
   const renderQuestions = () => (
     <div className="plan-questions">
-      <h3>📝 请回答以下问题</h3>
-      <p className="plan-hint">
-        AI 将根据您的回答生成文档大纲。填写越详细，生成效果越好。
-      </p>
+      <h3>{i18n.planQuestionTitle}</h3>
+      <p className="plan-hint">{i18n.planQuestionHint}</p>
 
       {questions.map((q) => (
         <div key={q.id} className="plan-question-item">
-          <label>{q.question}</label>
+          <label>{i18n[q.questionKey]}</label>
           <input
             type="text"
             value={q.answer}
             onChange={(e) => updateAnswer(q.id, e.target.value)}
-            placeholder={q.placeholder}
+            placeholder={i18n[q.placeholderKey]}
             disabled={isLoading}
           />
         </div>
@@ -332,15 +321,15 @@ ${outlineContext}
           {isLoading ? (
             <>
               <span className="button-spinner" />
-              生成大纲中...
+              {i18n.planGenerating}
             </>
           ) : (
-            "生成大纲"
+            i18n.planGenerateOutline
           )}
         </button>
         {isLoading && (
           <button className="plan-btn secondary" onClick={handleCancel}>
-            取消
+            {i18n.cancel}
           </button>
         )}
       </div>
@@ -350,15 +339,13 @@ ${outlineContext}
   const renderOutline = () => (
     <div className="plan-outline">
       <div className="plan-outline-header">
-        <h3>📋 文档大纲</h3>
+        <h3>{i18n.planOutlineTitle}</h3>
         <button className="plan-btn text" onClick={() => setStep("questions")}>
-          ← 返回修改
+          {i18n.planBackToQuestions}
         </button>
       </div>
 
-      <p className="plan-hint">
-        点击「生成」按钮生成各章节内容，可在生成前修改提示词。
-      </p>
+      <p className="plan-hint">{i18n.planOutlineHint}</p>
 
       <div className="plan-sections">
         {outline.map((section, index) => (
@@ -370,10 +357,10 @@ ${outlineContext}
                 <p>{section.description}</p>
               </div>
               <div className="plan-section-status">
-                {section.status === "pending" && "待生成"}
-                {section.status === "generating" && "生成中..."}
-                {section.status === "done" && "✓ 完成"}
-                {section.status === "error" && "✗ 失败"}
+                {section.status === "pending" && i18n.planPending}
+                {section.status === "generating" && i18n.loading}
+                {section.status === "done" && i18n.planDone}
+                {section.status === "error" && i18n.planFailed}
               </div>
             </div>
 
@@ -383,14 +370,14 @@ ${outlineContext}
                   type="text"
                   value={section.customPrompt}
                   onChange={(e) => updateSectionPrompt(section.id, e.target.value)}
-                  placeholder="额外提示词（可选）"
+                  placeholder={i18n.planExtraPrompt}
                 />
                 <button
                   className="plan-btn primary small"
                   onClick={() => generateSection(section.id)}
                   disabled={!isConfigured}
                 >
-                  生成
+                  {i18n.planGenerate}
                 </button>
               </div>
             )}
@@ -398,9 +385,9 @@ ${outlineContext}
             {section.status === "generating" && (
               <div className="plan-section-loading">
                 <span className="button-spinner" />
-                正在生成内容...
+                {i18n.loading}
                 <button className="plan-btn text small" onClick={handleCancel}>
-                  取消
+                  {i18n.cancel}
                 </button>
               </div>
             )}
@@ -424,13 +411,13 @@ ${outlineContext}
                       );
                     }}
                   >
-                    重新生成
+                    {i18n.planRegenerate}
                   </button>
                   <button
                     className="plan-btn primary small"
                     onClick={() => insertSection(section.id)}
                   >
-                    插入文档
+                    {i18n.planInsertDoc}
                   </button>
                 </div>
               </div>
@@ -438,12 +425,12 @@ ${outlineContext}
 
             {section.status === "error" && (
               <div className="plan-section-error">
-                <span>生成失败</span>
+                <span>{i18n.planFailed}</span>
                 <button
                   className="plan-btn secondary small"
                   onClick={() => generateSection(section.id)}
                 >
-                  重试
+                  {i18n.retry}
                 </button>
               </div>
             )}
@@ -455,11 +442,11 @@ ${outlineContext}
 
       <div className="plan-actions">
         <button className="plan-btn secondary" onClick={handleReset}>
-          重新开始
+          {i18n.planReset}
         </button>
         {outline.some((s) => s.status === "done") && (
           <button className="plan-btn primary" onClick={insertAllSections}>
-            插入全部已完成章节
+            {i18n.planInsertAll}
           </button>
         )}
       </div>
@@ -471,7 +458,7 @@ ${outlineContext}
       {!isConfigured && (
         <div className="config-status">
           <span>⚠️</span>
-          <span>请先在设置中配置 API Key</span>
+          <span>{i18n.configRequired}</span>
         </div>
       )}
 

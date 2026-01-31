@@ -370,19 +370,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
       <div className="messages-container">
         {messages.length === 0 ? (
           <div className="empty-state">
-            <h3>开始对话</h3>
-            <p>
-              选中文档中的文本，然后告诉我你想要做什么。
-              <br />
-              例如：润色这段话、翻译成英文、添加批注建议...
-            </p>
+            <h3>{i18n.chatEmpty}</h3>
+            <p>{i18n.chatEmptyHint}</p>
             <div className="quick-actions">
               <button
                 className="quick-action-btn"
                 onClick={handleStructureAnalysis}
                 disabled={!isConfigured || isLoading}
               >
-                📊 结构检查
+                {i18n.chatStructureCheck}
               </button>
             </div>
           </div>
@@ -393,9 +389,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         {isLoading && (
           <div className="loading">
             <div className="loading-spinner" />
-            <span>AI 正在思考...</span>
+            <span>{i18n.chatThinking}</span>
             <button className="cancel-button" onClick={handleCancel}>
-              停止
+              {i18n.chatStop}
             </button>
           </div>
         )}

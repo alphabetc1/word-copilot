@@ -8,13 +8,7 @@ import {
   ToneOption,
   LengthOption,
   LanguageOption,
-  SCENARIO_LABELS,
-  SCENARIO_DESCRIPTIONS,
   SCENARIO_PRESETS,
-  STYLE_LABELS,
-  TONE_LABELS,
-  LENGTH_LABELS,
-  LANGUAGE_LABELS,
   DEFAULT_MODEL_CONFIG,
   DEFAULT_USER_RULES,
   COMMON_MODELS,
@@ -26,7 +20,46 @@ import {
   loadUserRules,
   saveUserRules,
 } from "../../helpers/settings";
-import { t, Language, getLanguage, saveLanguage } from "../../helpers/i18n";
+import { t, Language, getLanguage, saveLanguage, Translations } from "../../helpers/i18n";
+
+// Helper to get scenario labels from i18n
+const getScenarioLabels = (i18n: Translations): Record<ScenarioOption, string> => ({
+  custom: i18n.scenarioCustom,
+  sci_paper: i18n.scenarioSciPaper,
+  clinical_report: i18n.scenarioClinical,
+  project_proposal: i18n.scenarioProposal,
+  official_notice: i18n.scenarioOfficial,
+});
+
+// Helper to get style labels from i18n
+const getStyleLabels = (i18n: Translations): Record<StyleOption, string> => ({
+  academic: i18n.styleAcademic,
+  formal: i18n.styleFormal,
+  business: i18n.styleBusiness,
+  casual: i18n.styleCasual,
+  creative: i18n.styleCreative,
+});
+
+// Helper to get tone labels from i18n
+const getToneLabels = (i18n: Translations): Record<ToneOption, string> => ({
+  rigorous: i18n.toneRigorous,
+  neutral: i18n.toneNeutral,
+  friendly: i18n.toneFriendly,
+});
+
+// Helper to get length labels from i18n
+const getLengthLabels = (i18n: Translations): Record<LengthOption, string> => ({
+  concise: i18n.lengthConcise,
+  normal: i18n.lengthNormal,
+  detailed: i18n.lengthDetailed,
+});
+
+// Helper to get language labels from i18n
+const getLanguageLabels = (i18n: Translations): Record<LanguageOption, string> => ({
+  chinese: i18n.langChinese,
+  english: i18n.langEnglish,
+  follow_document: i18n.langFollowDoc,
+});
 
 interface SettingsPanelProps {
   onSaved?: () => void;
@@ -102,6 +135,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
   const [customModelInput, setCustomModelInput] = useState("");
   const [uiLanguage, setUiLanguage] = useState<Language>(getLanguage());
   const i18n = t();
+
+  // Get translated labels
+  const scenarioLabels = useMemo(() => getScenarioLabels(i18n), [i18n]);
+  const styleLabels = useMemo(() => getStyleLabels(i18n), [i18n]);
+  const toneLabels = useMemo(() => getToneLabels(i18n), [i18n]);
+  const lengthLabels = useMemo(() => getLengthLabels(i18n), [i18n]);
+  const languageLabels = useMemo(() => getLanguageLabels(i18n), [i18n]);
 
   // Determine if current model is a preset or custom
   const selectedModelId = useMemo(() => {
@@ -363,7 +403,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
             }}
             disabled={isProcessing}
           >
-            {(Object.entries(SCENARIO_LABELS) as [ScenarioOption, string][]).map(
+            {(Object.entries(scenarioLabels) as [ScenarioOption, string][]).map(
               ([key, label]) => (
                 <option key={key} value={key}>
                   {label}
@@ -371,9 +411,6 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
               )
             )}
           </select>
-          <p className="scenario-description">
-            {SCENARIO_DESCRIPTIONS[userRules.scenario]}
-          </p>
         </div>
 
         {/* Show preset rules info when not custom */}
@@ -391,7 +428,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
           {renderRadioGroup<StyleOption>(
             "style",
             userRules.style,
-            STYLE_LABELS,
+            styleLabels,
             (value) => setUserRules({ ...userRules, style: value })
           )}
         </div>
@@ -401,7 +438,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
           {renderRadioGroup<ToneOption>(
             "tone",
             userRules.tone,
-            TONE_LABELS,
+            toneLabels,
             (value) => setUserRules({ ...userRules, tone: value })
           )}
         </div>
@@ -411,7 +448,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
           {renderRadioGroup<LengthOption>(
             "length",
             userRules.length,
-            LENGTH_LABELS,
+            lengthLabels,
             (value) => setUserRules({ ...userRules, length: value })
           )}
         </div>
@@ -421,7 +458,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
           {renderRadioGroup<LanguageOption>(
             "language",
             userRules.language,
-            LANGUAGE_LABELS,
+            languageLabels,
             (value) => setUserRules({ ...userRules, language: value })
           )}
         </div>
