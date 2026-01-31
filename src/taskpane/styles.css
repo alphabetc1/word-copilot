@@ -747,3 +747,182 @@ body {
   background: #f3f2f1;
   font-weight: 600;
 }
+
+/* ==================== Session Styles ==================== */
+
+/* Session Header */
+.session-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f3f2f1;
+  border-bottom: 1px solid #edebe9;
+}
+
+.session-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: white;
+  border: 1px solid #d2d0ce;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-toggle-btn:hover {
+  background: #faf9f8;
+  border-color: #0078d4;
+}
+
+.new-session-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.new-session-btn:hover {
+  background: #106ebe;
+}
+
+/* Session List */
+.session-list {
+  background: white;
+  border-bottom: 1px solid #edebe9;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.session-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #605e5c;
+  background: #faf9f8;
+  border-bottom: 1px solid #edebe9;
+}
+
+.new-session-button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.new-session-button:hover {
+  background: #106ebe;
+}
+
+.session-items {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f2f1;
+  transition: background 0.15s;
+}
+
+.session-item:hover {
+  background: #f3f2f1;
+}
+
+.session-item.active {
+  background: #deecf9;
+  border-left: 3px solid #0078d4;
+}
+
+.session-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.session-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #323130;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-meta {
+  display: block;
+  font-size: 11px;
+  color: #8a8886;
+  margin-top: 2px;
+}
+
+.session-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.session-item:hover .session-actions {
+  opacity: 1;
+}
+
+.session-action-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.session-action-btn:hover {
+  background: #edebe9;
+}
+
+.session-action-btn.delete:hover {
+  background: #fce8e6;
+}
+
+.session-name-input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #0078d4;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+}

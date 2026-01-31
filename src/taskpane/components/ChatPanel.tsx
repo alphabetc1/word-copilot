@@ -1,9 +1,10 @@
 import * as React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { DisplayMessage } from "../../types/llm";
 import { TOOL_DEFINITIONS } from "../../types/tools";
 import { loadModelConfig, loadUserRules } from "../../helpers/settings";
-import { getContextManager, ContextManager } from "../../helpers/contextManager";
+import { formatUserRules } from "../../helpers/contextManager";
+import { getSessionManager, SessionManager, Session } from "../../helpers/sessionManager";
 import { sendChat } from "../../helpers/llmClient";
 import { SYSTEM_PROMPT } from "../../helpers/systemPrompt";
 import {
@@ -13,31 +14,43 @@ import {
 } from "../../helpers/toolExecutor";
 import { getSelectionText, getDocumentText } from "../../helpers/wordBridge";
 import MessageItem from "./MessageItem";
+import SessionList from "./SessionList";
 
 interface ChatPanelProps {
   isConfigured: boolean;
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
-  const contextManagerRef = useRef<ContextManager>(getContextManager());
-  // Initialize messages from context manager to persist across tab switches
-  const [messages, setMessages] = useState<DisplayMessage[]>(
-    () => contextManagerRef.current.getDisplayMessages()
+  const sessionManagerRef = useRef<SessionManager>(getSessionManager());
+  const [sessions, setSessions] = useState<Session[]>(() =>
+    sessionManagerRef.current.getSessionList()
+  );
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(() =>
+    sessionManagerRef.current.getActiveSession()?.id || null
+  );
+  const [messages, setMessages] = useState<DisplayMessage[]>(() =>
+    sessionManagerRef.current.getDisplayMessages()
   );
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showSessionList, setShowSessionList] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   // AbortController for cancelling requests
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Refresh sessions list
+  const refreshSessions = useCallback(() => {
+    const sm = sessionManagerRef.current;
+    setSessions(sm.getSessionList());
+    setActiveSessionId(sm.getActiveSession()?.id || null);
+    setMessages(sm.getDisplayMessages());
+  }, []);
+
   // Restore messages when component mounts (e.g., after tab switch)
   useEffect(() => {
-    const savedMessages = contextManagerRef.current.getDisplayMessages();
-    if (savedMessages.length > 0) {
-      setMessages(savedMessages);
-    }
-  }, []);
+    refreshSessions();
+  }, [refreshSessions]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -52,6 +65,33 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
     }
   };
 
+  // Session management handlers
+  const handleSelectSession = (sessionId: string) => {
+    const sm = sessionManagerRef.current;
+    sm.setActiveSession(sessionId);
+    refreshSessions();
+    setShowSessionList(false);
+  };
+
+  const handleNewSession = () => {
+    const sm = sessionManagerRef.current;
+    sm.createSession();
+    refreshSessions();
+    setShowSessionList(false);
+  };
+
+  const handleDeleteSession = (sessionId: string) => {
+    const sm = sessionManagerRef.current;
+    sm.deleteSession(sessionId);
+    refreshSessions();
+  };
+
+  const handleRenameSession = (sessionId: string, newName: string) => {
+    const sm = sessionManagerRef.current;
+    sm.renameSession(sessionId, newName);
+    refreshSessions();
+  };
+
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading || !isConfigured) return;
 
@@ -61,7 +101,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
     // Create new AbortController for this request
     abortControllerRef.current = new AbortController();
-    const contextManager = contextManagerRef.current;
+    const sm = sessionManagerRef.current;
 
     try {
       // Get current selection and document context
@@ -78,28 +118,26 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
       // Load settings
       const config = loadModelConfig();
       const userRules = loadUserRules();
+      const userRulesText = formatUserRules(userRules);
 
       // Build user message
-      const userMessage = contextManager.buildUserMessage(
+      const userMessage = sm.buildUserMessage(
         userInput,
         selection,
         documentText,
-        userRules
+        userRulesText
       );
 
-      // Add to context
-      contextManager.addMessage(userMessage);
-
-      // Add to display
-      contextManager.addDisplayMessage("user", userInput);
-      setMessages([...contextManager.getDisplayMessages()]);
+      // Add to session
+      sm.addMessage(userMessage);
+      sm.addDisplayMessage("user", userInput);
+      setMessages(sm.getDisplayMessages());
 
       // Send to LLM
-      // First try with tools, if it fails with 400, retry without tools
       let result = await sendChat({
         config,
         systemPrompt: SYSTEM_PROMPT,
-        messages: contextManager.getMessages(),
+        messages: sm.getMessages(),
         tools: TOOL_DEFINITIONS,
         toolChoice: "auto",
         abortController: abortControllerRef.current!,
@@ -111,9 +149,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         result = await sendChat({
           config,
           systemPrompt: SYSTEM_PROMPT,
-          messages: contextManager.getMessages(),
+          messages: sm.getMessages(),
           abortController: abortControllerRef.current!,
-          // No tools - for models that don't support function calling
         });
       }
 
@@ -130,7 +167,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         const toolResultText = formatToolResults(toolResults);
 
         // Add tool result to display
-        contextManager.addDisplayMessage(
+        sm.addDisplayMessage(
           "tool_result",
           toolResultText,
           undefined,
@@ -139,34 +176,32 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
         // Add natural language response if present
         if (result.message.content) {
-          // Only add text content to context (without tool_calls to avoid API errors)
-          contextManager.addMessage({
+          sm.addMessage({
             role: "assistant",
             content: result.message.content,
           });
-          contextManager.addDisplayMessage("assistant", result.message.content);
+          sm.addDisplayMessage("assistant", result.message.content);
         } else {
-          // Add a summary of what was done to context
-          contextManager.addMessage({
+          sm.addMessage({
             role: "assistant",
             content: `[已执行操作: ${toolResultText}]`,
           });
         }
       } else if (result.message.content) {
-        // No tool calls, add the response to context and display
-        contextManager.addMessage({
+        sm.addMessage({
           role: "assistant",
           content: result.message.content,
         });
-        contextManager.addDisplayMessage("assistant", result.message.content);
+        sm.addDisplayMessage("assistant", result.message.content);
       }
 
-      setMessages([...contextManager.getDisplayMessages()]);
+      setMessages(sm.getDisplayMessages());
+      refreshSessions(); // Update session list with new message count
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "An error occurred";
-      contextManager.addDisplayMessage("assistant", errorMessage, undefined, true);
-      setMessages([...contextManager.getDisplayMessages()]);
+      sm.addDisplayMessage("assistant", errorMessage, undefined, true);
+      setMessages(sm.getDisplayMessages());
     } finally {
       setIsLoading(false);
       abortControllerRef.current = null;
@@ -181,12 +216,44 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   };
 
   const handleClear = () => {
-    contextManagerRef.current.clearMessages();
-    setMessages([]);
+    sessionManagerRef.current.clearActiveSession();
+    refreshSessions();
   };
+
+  const activeSession = sessions.find((s) => s.id === activeSessionId);
 
   return (
     <div className="chat-panel">
+      {/* Session Header */}
+      <div className="session-header">
+        <button
+          className="session-toggle-btn"
+          onClick={() => setShowSessionList(!showSessionList)}
+          title="会话列表"
+        >
+          📋 {activeSession?.name || "新对话"}
+        </button>
+        <button
+          className="new-session-btn"
+          onClick={handleNewSession}
+          title="新建对话"
+        >
+          +
+        </button>
+      </div>
+
+      {/* Session List Dropdown */}
+      {showSessionList && (
+        <SessionList
+          sessions={sessions}
+          activeSessionId={activeSessionId}
+          onSelectSession={handleSelectSession}
+          onNewSession={handleNewSession}
+          onDeleteSession={handleDeleteSession}
+          onRenameSession={handleRenameSession}
+        />
+      )}
+
       {/* Messages Area */}
       <div className="messages-container">
         {messages.length === 0 ? (
