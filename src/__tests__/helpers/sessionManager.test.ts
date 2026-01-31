@@ -49,7 +49,7 @@ describe("SessionManager", () => {
   describe("Session Switching", () => {
     it("should switch active session", () => {
       const session1 = sessionManager.createSession("Session 1");
-      const session2 = sessionManager.createSession("Session 2");
+      sessionManager.createSession("Session 2"); // Create second session
 
       sessionManager.setActiveSession(session1.id);
       const active = sessionManager.getActiveSession();

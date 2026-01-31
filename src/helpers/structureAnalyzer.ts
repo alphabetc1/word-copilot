@@ -4,7 +4,7 @@
 
 import { sendChat } from "./llmClient";
 import { loadModelConfig } from "./settings";
-import { getDocumentText, addCommentToSelection } from "./wordBridge";
+import { getDocumentText } from "./wordBridge";
 
 /**
  * Structure analysis result
