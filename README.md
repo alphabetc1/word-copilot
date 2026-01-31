@@ -229,7 +229,7 @@ word-copilot/
 提交代码前请确保：
 1. 运行 `npm run lint` 通过代码检查
 2. 运行 `npm run test` 通过所有测试
-3. 提交信息符合规范（英文，10 词以内）
+3. 提交信息符合规范
 
 ## 📄 License
 
