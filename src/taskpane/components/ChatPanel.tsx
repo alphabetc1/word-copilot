@@ -14,6 +14,8 @@ import {
 } from "../../helpers/toolExecutor";
 import { getSelectionText, getDocumentText } from "../../helpers/wordBridge";
 import { analyzeDocumentStructure } from "../../helpers/structureAnalyzer";
+import { getVoiceController, isSpeechRecognitionSupported } from "../../helpers/voiceInput";
+import { t, getLanguage } from "../../helpers/i18n";
 import MessageItem from "./MessageItem";
 import SessionList from "./SessionList";
 
@@ -36,15 +38,73 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSessionList, setShowSessionList] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // AbortController for cancelling requests
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Voice input support check
+  const voiceSupported = isSpeechRecognitionSupported();
+  const i18n = t();
+
   // Show toast notification
   const showToast = (message: string, type: "success" | "error" = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 2000);
+  };
+
+  // Voice input handler
+  const handleVoiceInput = () => {
+    if (!voiceSupported) {
+      showToast(i18n.voiceNotSupported, "error");
+      return;
+    }
+
+    const controller = getVoiceController();
+
+    // Set language based on current i18n setting
+    controller.setLanguage(getLanguage());
+
+    if (isListening) {
+      controller.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const success = controller.start({
+      onResult: (result) => {
+        // Append transcript to input
+        setInputValue((prev) => {
+          // If final, replace last interim result; otherwise append
+          if (result.isFinal) {
+            // Just append final result
+            return prev + result.transcript;
+          }
+          return prev;
+        });
+      },
+      onError: (error, message) => {
+        console.error("Voice input error:", error, message);
+        if (error === "permission-denied") {
+          showToast(i18n.voicePermissionDenied, "error");
+        } else if (error !== "aborted" && error !== "no-speech") {
+          showToast(`${i18n.error}: ${message}`, "error");
+        }
+        setIsListening(false);
+      },
+      onStart: () => {
+        setIsListening(true);
+        showToast(i18n.voiceListening);
+      },
+      onEnd: () => {
+        setIsListening(false);
+      },
+    });
+
+    if (!success) {
+      setIsListening(false);
+    }
   };
 
   // Refresh sessions list
@@ -348,7 +408,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         {messages.length > 0 && (
           <div style={{ marginBottom: 8, textAlign: "right" }}>
             <button className="clear-button" onClick={handleClear}>
-              清除对话
+              {i18n.chatEmpty}
             </button>
           </div>
         )}
@@ -359,17 +419,28 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
             onKeyDown={handleKeyDown}
             placeholder={
               isConfigured
-                ? "输入你的请求，Shift+Enter 换行..."
-                : "请先配置 API Key"
+                ? i18n.chatPlaceholder
+                : i18n.configRequired
             }
             disabled={isLoading || !isConfigured}
           />
+          {/* Voice Input Button - Experimental */}
+          {voiceSupported && (
+            <button
+              className={`voice-button ${isListening ? "listening" : ""}`}
+              onClick={handleVoiceInput}
+              disabled={isLoading || !isConfigured}
+              title={isListening ? i18n.voiceStop : i18n.voiceStart}
+            >
+              {isListening ? "⏹️" : "🎤"}
+            </button>
+          )}
           <button
             className="send-button"
             onClick={handleSend}
             disabled={!inputValue.trim() || isLoading || !isConfigured}
           >
-            发送
+            {i18n.chatSend}
           </button>
         </div>
       </div>
