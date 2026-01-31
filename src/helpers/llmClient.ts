@@ -125,8 +125,6 @@ export async function sendChat(params: SendChatParams): Promise<ChatResult> {
   }
 
   const endpoint = buildEndpoint(config.baseUrl);
-  console.log("Sending request to:", endpoint);
-  console.log("Request body (truncated):", JSON.stringify(requestBody, null, 2).substring(0, 500));
 
   // Use external controller if provided, otherwise create one with timeout
   const useExternalController = !!externalController;
