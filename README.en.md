@@ -45,10 +45,12 @@
 
 Use the pre-built version hosted on GitHub Pages:
 
-1. Download only the `manifest-prod.xml` file
+1. **Download manifest file**: [Click here to download manifest.xml](https://alphabetc1.github.io/word-copilot/manifest.xml) (right-click → Save As)
 2. In Word: **Insert → Add-ins → My Add-ins → Upload My Add-in**
-3. Select the downloaded `manifest-prod.xml`
+3. Select the downloaded `manifest.xml`
 4. Configure your API key in the add-in settings
+
+> **If you forked this repo**, use your own GitHub Pages URL: `https://<your-username>.github.io/word-copilot/manifest.xml`
 
 ### Option 2: Local Development (Mac)
 

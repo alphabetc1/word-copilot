@@ -44,10 +44,12 @@
 
 使用托管在 GitHub Pages 上的预构建版本：
 
-1. 仅下载 `manifest-prod.xml` 文件
+1. **下载 manifest 文件**：[点击这里下载 manifest.xml](https://alphabetc1.github.io/word-copilot/manifest.xml)（右键 → 另存为）
 2. 在 Word 中：**插入 → 加载项 → 我的加载项 → 上传我的加载项**
-3. 选择下载的 `manifest-prod.xml`
+3. 选择下载的 `manifest.xml`
 4. 在插件设置中配置你的 API Key
+
+> **如果你 Fork 了本仓库**，需要用你自己的 GitHub Pages 地址：`https://<你的用户名>.github.io/word-copilot/manifest.xml`
 
 ### 方式二：本地开发安装（Mac）
 
