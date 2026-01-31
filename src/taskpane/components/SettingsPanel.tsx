@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   ModelConfig,
   UserRules,
@@ -17,6 +17,8 @@ import {
   LANGUAGE_LABELS,
   DEFAULT_MODEL_CONFIG,
   DEFAULT_USER_RULES,
+  COMMON_MODELS,
+  CUSTOM_MODEL_ID,
 } from "../../types/settings";
 import {
   loadModelConfig,
@@ -95,11 +97,37 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
   const [userRules, setUserRules] = useState<UserRules>(DEFAULT_USER_RULES);
   const [status, setStatus] = useState<Status | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [customModelInput, setCustomModelInput] = useState("");
+
+  // Determine if current model is a preset or custom
+  const selectedModelId = useMemo(() => {
+    const found = COMMON_MODELS.find((m) => m.apiName === modelConfig.model);
+    return found ? found.id : CUSTOM_MODEL_ID;
+  }, [modelConfig.model]);
+
+  // Group models by provider for the dropdown
+  const modelsByProvider = useMemo(() => {
+    const grouped: Record<string, typeof COMMON_MODELS> = {};
+    COMMON_MODELS.forEach((model) => {
+      if (!grouped[model.provider]) {
+        grouped[model.provider] = [];
+      }
+      grouped[model.provider].push(model);
+    });
+    return grouped;
+  }, []);
 
   // Load settings on mount
   useEffect(() => {
-    setModelConfig(loadModelConfig());
+    const config = loadModelConfig();
+    setModelConfig(config);
     setUserRules(loadUserRules());
+
+    // If model is custom, set the input value
+    const isPreset = COMMON_MODELS.some((m) => m.apiName === config.model);
+    if (!isPreset && config.model) {
+      setCustomModelInput(config.model);
+    }
   }, []);
 
   const handleSave = async () => {
@@ -214,16 +242,55 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>模型名称</label>
-          <input
-            type="text"
-            value={modelConfig.model}
-            onChange={(e) =>
-              setModelConfig({ ...modelConfig, model: e.target.value })
-            }
-            placeholder="gpt-4o / qwen-plus"
+          <label>模型</label>
+          <select
+            className="model-select"
+            value={selectedModelId}
+            onChange={(e) => {
+              const id = e.target.value;
+              if (id === CUSTOM_MODEL_ID) {
+                // Switch to custom, use the current custom input or empty
+                setModelConfig({
+                  ...modelConfig,
+                  model: customModelInput || "",
+                });
+              } else {
+                const preset = COMMON_MODELS.find((m) => m.id === id);
+                if (preset) {
+                  setModelConfig({ ...modelConfig, model: preset.apiName });
+                }
+              }
+            }}
             disabled={isProcessing}
-          />
+          >
+            {Object.entries(modelsByProvider).map(([provider, models]) => (
+              <optgroup key={provider} label={provider}>
+                {models.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+            <optgroup label="其他">
+              <option value={CUSTOM_MODEL_ID}>自定义模型...</option>
+            </optgroup>
+          </select>
+
+          {/* Custom model input - shown when custom is selected */}
+          {selectedModelId === CUSTOM_MODEL_ID && (
+            <input
+              type="text"
+              className="custom-model-input"
+              value={customModelInput}
+              onChange={(e) => {
+                setCustomModelInput(e.target.value);
+                setModelConfig({ ...modelConfig, model: e.target.value });
+              }}
+              placeholder="输入模型名称，如 llama-3.1-70b"
+              disabled={isProcessing}
+            />
+          )}
         </div>
       </section>
 

@@ -314,6 +314,51 @@ body {
   box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
 }
 
+/* Model Selection */
+.model-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d2d0ce;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+  color: #323130;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.model-select:focus {
+  outline: none;
+  border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+}
+
+.model-select optgroup {
+  font-weight: 600;
+  color: #605e5c;
+}
+
+.model-select option {
+  font-weight: 400;
+  color: #323130;
+  padding: 4px;
+}
+
+.custom-model-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d2d0ce;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.custom-model-input:focus {
+  outline: none;
+  border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+}
+
 .scenario-description {
   font-size: 12px;
   color: #605e5c;

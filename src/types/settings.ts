@@ -79,6 +79,41 @@ export const DEFAULT_MODEL_CONFIG: ModelConfig = {
 };
 
 /**
+ * Common model presets with display name and API name
+ * Grouped by provider for better organization
+ */
+export interface ModelPreset {
+  id: string;        // Internal identifier
+  name: string;      // Display name
+  apiName: string;   // Actual API model name
+  provider: string;  // Provider name for grouping
+}
+
+export const COMMON_MODELS: ModelPreset[] = [
+  // OpenAI
+  { id: "gpt-4o", name: "GPT-4o", apiName: "gpt-4o", provider: "OpenAI" },
+  { id: "gpt-4o-mini", name: "GPT-4o Mini", apiName: "gpt-4o-mini", provider: "OpenAI" },
+  { id: "gpt-4-turbo", name: "GPT-4 Turbo", apiName: "gpt-4-turbo", provider: "OpenAI" },
+  { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", apiName: "gpt-3.5-turbo", provider: "OpenAI" },
+  // Anthropic
+  { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", apiName: "claude-3-5-sonnet-20241022", provider: "Anthropic" },
+  { id: "claude-3-opus", name: "Claude 3 Opus", apiName: "claude-3-opus-20240229", provider: "Anthropic" },
+  { id: "claude-3-haiku", name: "Claude 3 Haiku", apiName: "claude-3-haiku-20240307", provider: "Anthropic" },
+  // Alibaba Cloud (DashScope)
+  { id: "qwen-plus", name: "通义千问 Plus", apiName: "qwen-plus", provider: "阿里云" },
+  { id: "qwen-turbo", name: "通义千问 Turbo", apiName: "qwen-turbo", provider: "阿里云" },
+  { id: "qwen-max", name: "通义千问 Max", apiName: "qwen-max", provider: "阿里云" },
+  // DeepSeek
+  { id: "deepseek-chat", name: "DeepSeek Chat", apiName: "deepseek-chat", provider: "DeepSeek" },
+  { id: "deepseek-coder", name: "DeepSeek Coder", apiName: "deepseek-coder", provider: "DeepSeek" },
+];
+
+/**
+ * Special option for custom model input
+ */
+export const CUSTOM_MODEL_ID = "_custom_";
+
+/**
  * Style option labels (Chinese)
  */
 export const STYLE_LABELS: Record<StyleOption, string> = {
