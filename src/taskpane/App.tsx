@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import ChatPanel from "./components/ChatPanel";
+import PlanPanel from "./components/PlanPanel";
 import SettingsPanel from "./components/SettingsPanel";
 import { isModelConfigured } from "../helpers/settings";
 
-type TabType = "chat" | "settings";
+type TabType = "chat" | "plan" | "settings";
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>("chat");
@@ -35,6 +36,12 @@ const App: React.FC = () => {
           对话
         </button>
         <button
+          className={activeTab === "plan" ? "active" : ""}
+          onClick={() => setActiveTab("plan")}
+        >
+          计划
+        </button>
+        <button
           className={activeTab === "settings" ? "active" : ""}
           onClick={() => setActiveTab("settings")}
         >
@@ -44,7 +51,7 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="main-content">
-        {activeTab === "chat" ? (
+        {activeTab === "chat" && (
           <>
             {!isConfigured && (
               <div className="config-status">
@@ -54,7 +61,9 @@ const App: React.FC = () => {
             )}
             <ChatPanel isConfigured={isConfigured} />
           </>
-        ) : (
+        )}
+        {activeTab === "plan" && <PlanPanel isConfigured={isConfigured} />}
+        {activeTab === "settings" && (
           <SettingsPanel onSaved={handleSettingsSaved} />
         )}
       </main>
