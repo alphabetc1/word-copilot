@@ -35,10 +35,17 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSessionList, setShowSessionList] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // AbortController for cancelling requests
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Show toast notification
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 2000);
+  };
 
   // Refresh sessions list
   const refreshSessions = useCallback(() => {
@@ -76,15 +83,21 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
   const handleNewSession = () => {
     const sm = sessionManagerRef.current;
-    sm.createSession();
+    const newSession = sm.createSession();
     refreshSessions();
     setShowSessionList(false);
+    showToast(`✓ 已创建新对话: ${newSession.name}`);
   };
 
   const handleDeleteSession = (sessionId: string) => {
     const sm = sessionManagerRef.current;
-    sm.deleteSession(sessionId);
+    const deleted = sm.deleteSession(sessionId);
     refreshSessions();
+    if (deleted) {
+      showToast("已删除对话");
+    } else {
+      showToast("已清空对话内容");
+    }
   };
 
   const handleRenameSession = (sessionId: string, newName: string) => {
@@ -256,6 +269,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
   return (
     <div className="chat-panel">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`toast ${toast.type}`}>
+          {toast.message}
+        </div>
+      )}
+
       {/* Session Header */}
       <div className="session-header">
         <button

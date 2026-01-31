@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Session, getSessionManager } from "../../helpers/sessionManager";
+import { Session } from "../../helpers/sessionManager";
 
 interface SessionListProps {
   sessions: Session[];
@@ -21,6 +21,7 @@ const SessionList: React.FC<SessionListProps> = ({
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const handleStartEdit = (session: Session, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -43,6 +44,22 @@ const SessionList: React.FC<SessionListProps> = ({
       setEditingId(null);
       setEditName("");
     }
+  };
+
+  const handleDeleteClick = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteConfirmId(sessionId);
+  };
+
+  const handleConfirmDelete = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDeleteSession(sessionId);
+    setDeleteConfirmId(null);
+  };
+
+  const handleCancelDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteConfirmId(null);
   };
 
   const formatTime = (timestamp: number) => {
@@ -89,6 +106,23 @@ const SessionList: React.FC<SessionListProps> = ({
                 onClick={(e) => e.stopPropagation()}
                 autoFocus
               />
+            ) : deleteConfirmId === session.id ? (
+              // Inline delete confirmation (no confirm() needed)
+              <div className="delete-confirm">
+                <span>确定删除？</span>
+                <button
+                  className="confirm-btn yes"
+                  onClick={(e) => handleConfirmDelete(session.id, e)}
+                >
+                  是
+                </button>
+                <button
+                  className="confirm-btn no"
+                  onClick={handleCancelDelete}
+                >
+                  否
+                </button>
+              </div>
             ) : (
               <>
                 <div className="session-info">
@@ -107,12 +141,7 @@ const SessionList: React.FC<SessionListProps> = ({
                   </button>
                   <button
                     className="session-action-btn delete"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (confirm("确定要删除这个对话吗？")) {
-                        onDeleteSession(session.id);
-                      }
-                    }}
+                    onClick={(e) => handleDeleteClick(session.id, e)}
                     title="删除"
                   >
                     🗑️
