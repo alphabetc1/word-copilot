@@ -926,3 +926,33 @@ body {
   font-size: 13px;
   outline: none;
 }
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.quick-action-btn {
+  padding: 8px 16px;
+  background: #f3f2f1;
+  border: 1px solid #d2d0ce;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-action-btn:hover:not(:disabled) {
+  background: #deecf9;
+  border-color: #0078d4;
+  color: #0078d4;
+}
+
+.quick-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -13,6 +13,7 @@ import {
   formatToolResults,
 } from "../../helpers/toolExecutor";
 import { getSelectionText, getDocumentText } from "../../helpers/wordBridge";
+import { analyzeDocumentStructure } from "../../helpers/structureAnalyzer";
 import MessageItem from "./MessageItem";
 import SessionList from "./SessionList";
 
@@ -220,6 +221,37 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
     refreshSessions();
   };
 
+  // Structure analysis handler
+  const handleStructureAnalysis = async () => {
+    if (!isConfigured || isLoading) return;
+
+    setIsLoading(true);
+    const sm = sessionManagerRef.current;
+
+    try {
+      sm.addDisplayMessage("user", "📊 执行文档结构检查...");
+      setMessages(sm.getDisplayMessages());
+
+      const result = await analyzeDocumentStructure();
+
+      if (result.success && result.report) {
+        sm.addMessage({ role: "assistant", content: result.report });
+        sm.addDisplayMessage("assistant", result.report);
+      } else {
+        sm.addDisplayMessage("assistant", result.error || "结构分析失败", undefined, true);
+      }
+
+      setMessages(sm.getDisplayMessages());
+      refreshSessions();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "分析失败";
+      sm.addDisplayMessage("assistant", errorMessage, undefined, true);
+      setMessages(sm.getDisplayMessages());
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const activeSession = sessions.find((s) => s.id === activeSessionId);
 
   return (
@@ -264,6 +296,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
               <br />
               例如：润色这段话、翻译成英文、添加批注建议...
             </p>
+            <div className="quick-actions">
+              <button
+                className="quick-action-btn"
+                onClick={handleStructureAnalysis}
+                disabled={!isConfigured || isLoading}
+              >
+                📊 结构检查
+              </button>
+            </div>
           </div>
         ) : (
           messages.map((msg) => <MessageItem key={msg.id} message={msg} />)

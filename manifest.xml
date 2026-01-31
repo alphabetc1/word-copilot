@@ -172,6 +172,21 @@
                       <FunctionName>addCommentSuggestion</FunctionName>
                     </Action>
                   </Item>
+                  <Item id="ContextStructureButton">
+                    <Label resid="StructureButton.Label"/>
+                    <Supertip>
+                      <Title resid="StructureButton.Label"/>
+                      <Description resid="StructureButton.Tooltip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16"/>
+                      <bt:Image size="32" resid="Icon.32x32"/>
+                      <bt:Image size="80" resid="Icon.80x80"/>
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>analyzeStructure</FunctionName>
+                    </Action>
+                  </Item>
                 </Items>
               </Control>
             </OfficeMenu>
@@ -198,6 +213,7 @@
         <bt:String id="PolishButton.Label" DefaultValue="润色选中内容"/>
         <bt:String id="TranslateButton.Label" DefaultValue="翻译选中内容"/>
         <bt:String id="CommentButton.Label" DefaultValue="添加批注建议"/>
+        <bt:String id="StructureButton.Label" DefaultValue="结构检查"/>
         <bt:String id="ContextMenu.Label" DefaultValue="Copilot"/>
       </bt:ShortStrings>
       <bt:LongStrings>
@@ -205,6 +221,7 @@
         <bt:String id="PolishButton.Tooltip" DefaultValue="使用 AI 润色选中的文本，使其更加清晰流畅"/>
         <bt:String id="TranslateButton.Tooltip" DefaultValue="使用 AI 翻译选中的文本"/>
         <bt:String id="CommentButton.Tooltip" DefaultValue="使用 AI 为选中内容添加改进建议"/>
+        <bt:String id="StructureButton.Tooltip" DefaultValue="分析文档结构，检查标题层级、必要模块、段落问题和引用规范"/>
         <bt:String id="ContextMenu.Tooltip" DefaultValue="Word Copilot AI 助手"/>
       </bt:LongStrings>
     </Resources>

@@ -12,6 +12,7 @@ import { getSystemPromptForCommand } from "../helpers/systemPrompt";
 import { executeToolCalls, hasToolCalls } from "../helpers/toolExecutor";
 import { getSelectionText, getDocumentText, showNotification } from "../helpers/wordBridge";
 import { formatUserRules } from "../helpers/contextManager";
+import { analyzeDocumentStructure } from "../helpers/structureAnalyzer";
 
 /**
  * Execute a command with the given prompt
@@ -129,6 +130,49 @@ async function addCommentSuggestion(event: Office.AddinCommands.Event): Promise<
 }
 
 /**
+ * Analyze document structure
+ */
+async function analyzeStructure(event: Office.AddinCommands.Event): Promise<void> {
+  // Check if configured
+  if (!isModelConfigured()) {
+    showNotification("请先在插件设置中配置 API Key", "error");
+    event.completed();
+    return;
+  }
+
+  showNotification("正在分析文档结构，请稍候...", "info");
+
+  try {
+    const result = await analyzeDocumentStructure();
+
+    if (!result.success) {
+      showNotification(result.error || "分析失败", "error");
+    } else {
+      // Show notification and display results in task pane if open
+      showNotification("结构分析完成，请查看结果", "info");
+
+      // Try to display in task pane by dispatching event
+      if (typeof window !== "undefined" && window.localStorage) {
+        // Store result for task pane to pick up
+        window.localStorage.setItem(
+          "word_copilot_structure_analysis",
+          JSON.stringify({
+            timestamp: Date.now(),
+            report: result.report,
+          })
+        );
+      }
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "分析失败";
+    showNotification(errorMessage, "error");
+    console.error("Structure analysis error:", error);
+  }
+
+  event.completed();
+}
+
+/**
  * Register commands with Office.js
  */
 function registerCommands(): void {
@@ -136,6 +180,7 @@ function registerCommands(): void {
   Office.actions.associate("polishSelection", polishSelection);
   Office.actions.associate("translateSelection", translateSelection);
   Office.actions.associate("addCommentSuggestion", addCommentSuggestion);
+  Office.actions.associate("analyzeStructure", analyzeStructure);
 }
 
 // Initialize on Office ready
@@ -146,4 +191,10 @@ Office.onReady((info) => {
 });
 
 // Export for testing
-export { polishSelection, translateSelection, addCommentSuggestion, executeCommand };
+export {
+  polishSelection,
+  translateSelection,
+  addCommentSuggestion,
+  analyzeStructure,
+  executeCommand,
+};
