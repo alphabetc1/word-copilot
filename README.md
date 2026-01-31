@@ -1,136 +1,242 @@
-# Word Copilot
+<p align="center">
+  <img src="assets/logo.png" alt="Word Copilot Logo" width="180">
+</p>
 
-基于 Office.js 的 Word 智能写作助手插件，集成大模型 API，支持文档润色、翻译、批注等功能。
+<h1 align="center">Word Copilot</h1>
 
-## 功能特性
+<p align="center">
+  <strong>🤖 AI 驱动的 Word 智能写作助手</strong><br>
+  基于 Office.js 构建，无缝集成大模型 API，让你的写作更高效
+</p>
 
-- **侧边栏对话**：在 Word 中与 AI 进行多轮对话，处理选中文本
-- **右键菜单命令**：快速润色、翻译、添加批注建议
-- **用户规则配置**：自定义写作风格、语气、长度、语言偏好
-- **Function Calling**：通过工具调用机制直接操作 Word 文档
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-Word%202016%2B-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/language-TypeScript-3178c6" alt="TypeScript">
+  <img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License">
+</p>
 
+---
 
-## 快速开始
+## ✨ 功能亮点
 
-### Mac
+| 功能 | 说明 |
+|------|------|
+| 💬 **智能对话** | 在 Word 侧边栏与 AI 进行多轮对话，处理选中文本 |
+| ⚡ **快捷命令** | 右键菜单一键润色、翻译、添加批注 |
+| 📊 **结构检查** | AI 分析文档结构，检查标题层级、引用规范等 |
+| 📝 **多场景支持** | 预置学术论文、临床报告、项目申报、公文等写作规范 |
+| 💾 **多会话管理** | 支持多个独立对话，历史记录本地保存 |
+| 🔄 **修订模式** | 文档修改使用 Word 修订功能，可选择接受/拒绝 |
+
+## 🚀 快速开始
+
+### 前置要求
+
+- [Node.js](https://nodejs.org/) 18.0 或更高版本
+- Microsoft Word 2016+ (Windows/Mac) 或 Word Online
+- 一个大模型 API Key（支持 OpenAI、Azure、阿里云通义等）
+
+### Mac 安装步骤
 
 ```bash
-# 1. 安装依赖
+# 1️⃣ 克隆项目并安装依赖
+git clone https://github.com/your-repo/word-copilot.git
+cd word-copilot
 npm install
 
-# 2. 安装 HTTPS 证书（首次需要，会要求输入密码）
+# 2️⃣ 安装开发证书（首次需要，会提示输入系统密码）
 npm run dev:certs
 
-# 3. Sideload 插件到 Word
+# 3️⃣ 将插件加载到 Word
 npm run sideload:mac
 
-# 4. 启动开发服务器
+# 4️⃣ 启动开发服务器
 npm run dev
 
-# 5. 完全退出 Word (Cmd+Q)，重新打开
-# 6. 插入 → 加载项 → 我的加载项 → 选择 Word Copilot
+# 5️⃣ 重启 Word
+# ⚠️ 必须完全退出 Word (Cmd+Q)，然后重新打开
+
+# 6️⃣ 加载插件
+# 打开 Word → 插入 → 加载项 → 我的加载项 → 选择 Word Copilot
 ```
 
-### Windows
+### Windows 安装步骤
 
 ```bash
-# 1. 安装依赖
+# 1️⃣ 安装依赖
 npm install
 
-# 2. 启动开发服务器
+# 2️⃣ 启动开发服务器
 npm run dev
 
-# 3. 在 Word 中：插入 → 获取加载项 → 我的加载项 → 上传我的加载项
-# 4. 选择项目中的 manifest.xml 文件
+# 3️⃣ 在 Word 中加载插件
+# 打开 Word → 插入 → 获取加载项 → 我的加载项 → 上传我的加载项 → 选择 manifest.xml
 ```
 
 ### Word Online
 
 ```bash
 npm install && npm run dev
-# 然后在 Word Online: 插入 → 加载项 → 上传我的加载项 → 选择 manifest.xml
+# 在 Word Online: 插入 → 加载项 → 上传我的加载项 → 选择 manifest.xml
 ```
 
-### 配置 API
+## ⚙️ 配置 API
 
-1. 打开插件侧边栏，切换到「设置」标签
-2. 填写：
-   - **Base URL**: 例如 `https://api.openai.com`
-   - **API Key**: 你的 API 密钥
-   - **模型名称**: 例如 `gpt-4o`
-3. 点击「保存设置」
+首次使用需要配置你的大模型 API：
 
-## 使用方法
+1. 打开 Word Copilot 侧边栏
+2. 点击 **「设置」** 标签
+3. 填写以下信息：
 
-### 侧边栏对话
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| **Base URL** | API 服务地址 | `https://api.openai.com` |
+| **API Key** | 你的密钥 | `sk-xxxx...` |
+| **模型名称** | 使用的模型 | `gpt-4o` / `qwen-plus` |
 
-1. 选中要处理的文本
-2. 在侧边栏输入指令，例如：
-   - "润色这段话"
-   - "翻译成英文"
-   - "让这段话更简洁"
-3. AI 会自动执行相应操作
+4. 点击 **「保存设置」**，系统会自动测试连接
 
-### 右键菜单
+### 支持的 API 服务
 
-选中文本 → 右键 → Copilot 菜单：
-- **润色选中内容**
-- **翻译选中内容**
-- **添加批注建议**
+- ✅ OpenAI（官方）
+- ✅ Azure OpenAI
+- ✅ 阿里云通义千问（DashScope）
+- ✅ 其他兼容 OpenAI 格式的服务
 
+## 📖 使用指南
 
-## 项目结构
+### 方式一：侧边栏对话
 
-```
-/word-copilot
-├── manifest.xml                    # Office Add-in 清单文件
-├── package.json                    # 依赖配置
-├── tsconfig.json                   # TypeScript 配置
-├── webpack.config.js               # Webpack 打包配置
-├── src/
-│   ├── taskpane/                   # 侧边栏 UI
-│   │   ├── index.html
-│   │   ├── index.tsx
-│   │   ├── App.tsx
-│   │   ├── styles.css
-│   │   └── components/
-│   │       ├── ChatPanel.tsx       # 聊天面板
-│   │       ├── SettingsPanel.tsx   # 设置面板
-│   │       └── MessageItem.tsx     # 消息组件
-│   ├── commands/                   # 右键菜单命令
-│   │   ├── commands.html
-│   │   └── commands.ts
-│   ├── helpers/                    # 核心模块
-│   │   ├── llmClient.ts           # 大模型 API 客户端
-│   │   ├── wordBridge.ts          # Word 文档操作封装
-│   │   ├── contextManager.ts      # 对话上下文管理
-│   │   ├── settings.ts            # 设置存取
-│   │   ├── toolExecutor.ts        # 工具执行器
-│   │   └── systemPrompt.ts        # 系统提示词
-│   └── types/                      # 类型定义
-│       ├── llm.ts
-│       ├── tools.ts
-│       └── settings.ts
-└── assets/                         # 图标资源
-```
+最灵活的使用方式，支持复杂的多轮对话：
 
+1. **选中文本**：在文档中选中你想要处理的内容
+2. **输入指令**：在侧边栏输入你的需求
+3. **AI 处理**：AI 会自动分析并操作文档
 
-## 开发命令
+**常用指令示例**：
+- `润色这段话，使其更加学术化`
+- `翻译成英文，保持专业术语`
+- `检查这段的语法错误`
+- `把这段话压缩到 100 字以内`
+- `为这个观点添加解释说明`
+
+### 方式二：右键快捷菜单
+
+选中文本后右键，选择 **Copilot** 菜单：
+
+| 命令 | 功能 |
+|------|------|
+| 🎨 **润色选中内容** | 优化文字表达，使其更流畅专业 |
+| 🌐 **翻译选中内容** | 中英互译，保持术语准确性 |
+| 💡 **添加批注建议** | AI 分析内容并添加改进建议 |
+| 📊 **结构检查** | 分析整篇文档的结构问题 |
+
+### 方式三：结构检查（新功能）
+
+针对学术写作的专业功能，可检查：
+
+- 📑 标题层级是否规范（H1 → H2 → H3）
+- 📋 是否包含必要模块（摘要、引言、结论等）
+- 📝 段落是否过长或逻辑跳跃
+- 📚 引用标注是否完整
+
+## 🎯 写作场景预设
+
+在设置中可选择不同的写作场景，AI 会自动应用相应的规范：
+
+| 场景 | 适用于 | 特点 |
+|------|--------|------|
+| **学术论文 (SCI)** | 期刊投稿、学位论文 | IMRAD 结构、学术术语、被动语态 |
+| **临床研究报告** | 病例报告、临床试验 | CONSORT/STROBE 规范、ITT 分析 |
+| **项目申报书** | 基金申请、课题申报 | 创新性、可行性、技术路线 |
+| **行政通知/公文** | 政府公文、通知函 | 公文格式、规范用语 |
+| **自定义** | 灵活配置 | 自由设置风格和偏好 |
+
+## 🛠️ 开发命令
 
 ```bash
-npm run dev          # 启动开发服务器 (https://localhost:3000)
+npm run dev          # 启动开发服务器
 npm run build        # 构建生产版本
 npm run lint         # 代码检查
+npm run lint:fix     # 自动修复代码问题
+npm run test         # 运行测试
+npm run test:watch   # 监听模式运行测试
+npm run test:coverage # 生成覆盖率报告
 npm run validate     # 验证 manifest.xml
 ```
 
+## 📁 项目结构
 
-## 兼容性
+```
+word-copilot/
+├── 📄 manifest.xml              # Office 插件配置清单
+├── 📄 package.json              # 项目依赖和脚本
+├── 📄 jest.config.js            # 测试配置
+├── 📁 src/
+│   ├── 📁 taskpane/             # 侧边栏界面
+│   │   ├── App.tsx              # 主应用组件
+│   │   ├── styles.css           # 样式文件
+│   │   └── components/
+│   │       ├── ChatPanel.tsx    # 对话面板
+│   │       ├── SettingsPanel.tsx # 设置面板
+│   │       ├── SessionList.tsx  # 会话列表
+│   │       └── MessageItem.tsx  # 消息组件
+│   ├── 📁 commands/             # 右键菜单命令
+│   ├── 📁 helpers/              # 核心模块
+│   │   ├── llmClient.ts         # 大模型 API 客户端
+│   │   ├── wordBridge.ts        # Word 文档操作
+│   │   ├── sessionManager.ts    # 会话管理
+│   │   ├── structureAnalyzer.ts # 结构分析
+│   │   └── ...
+│   ├── 📁 types/                # TypeScript 类型定义
+│   └── 📁 __tests__/            # 单元测试
+└── 📁 assets/                   # 图标和资源
+```
 
-- Microsoft Word 2016+ (Windows/Mac)
-- Microsoft Word Online
-- 需要 Word API 1.1+
+## ❓ 常见问题
 
-## License
+<details>
+<summary><b>Mac 上"我的加载项"菜单是灰色的？</b></summary>
 
-Licensed under the [Apache License, Version 2.0](./LICENSE).
+1. 确保已运行 `npm run dev:certs` 安装证书
+2. 确保已运行 `npm run sideload:mac`
+3. 完全退出 Word (Cmd+Q)，然后重新打开
+4. 开发服务器必须保持运行 (`npm run dev`)
+</details>
+
+<details>
+<summary><b>API 连接失败怎么办？</b></summary>
+
+1. 检查 Base URL 是否正确（注意结尾不要有多余的 `/`）
+2. 确认 API Key 是否有效
+3. 检查网络是否能访问 API 服务
+4. 查看浏览器控制台的错误信息
+</details>
+
+<details>
+<summary><b>如何切换到其他 API 服务？</b></summary>
+
+在设置中修改 Base URL 即可，例如：
+- OpenAI: `https://api.openai.com`
+- Azure: `https://your-resource.openai.azure.com`
+- 阿里云: `https://dashscope.aliyuncs.com/compatible-mode/v1`
+</details>
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+提交代码前请确保：
+1. 运行 `npm run lint` 通过代码检查
+2. 运行 `npm run test` 通过所有测试
+3. 提交信息符合规范（英文，10 词以内）
+
+## 📄 License
+
+本项目采用 [Apache License 2.0](./LICENSE) 开源协议。
+
+---
+
+<p align="center">
+  如果这个项目对你有帮助，欢迎给个 ⭐ Star！
+</p>
