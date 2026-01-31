@@ -4,12 +4,14 @@ import ChatPanel from "./components/ChatPanel";
 import PlanPanel from "./components/PlanPanel";
 import SettingsPanel from "./components/SettingsPanel";
 import { isModelConfigured } from "../helpers/settings";
+import { t, loadLanguage, Language } from "../helpers/i18n";
 
 type TabType = "chat" | "plan" | "settings";
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>("chat");
   const [isConfigured, setIsConfigured] = useState(false);
+  const [, setLang] = useState<Language>(loadLanguage());
 
   useEffect(() => {
     // Check if model is configured on mount
@@ -20,11 +22,18 @@ const App: React.FC = () => {
     setIsConfigured(isModelConfigured());
   };
 
+  // Force re-render when language changes
+  const handleLanguageChange = () => {
+    setLang(loadLanguage());
+  };
+
+  const i18n = t();
+
   return (
     <div className="app-container">
       {/* Header */}
       <header className="app-header">
-        <h1>Word Copilot</h1>
+        <h1>{i18n.appTitle}</h1>
       </header>
 
       {/* Tab Navigation */}
@@ -33,19 +42,19 @@ const App: React.FC = () => {
           className={activeTab === "chat" ? "active" : ""}
           onClick={() => setActiveTab("chat")}
         >
-          对话
+          {i18n.tabChat}
         </button>
         <button
           className={activeTab === "plan" ? "active" : ""}
           onClick={() => setActiveTab("plan")}
         >
-          计划
+          {i18n.tabPlan}
         </button>
         <button
           className={activeTab === "settings" ? "active" : ""}
           onClick={() => setActiveTab("settings")}
         >
-          设置
+          {i18n.tabSettings}
         </button>
       </nav>
 
@@ -56,7 +65,7 @@ const App: React.FC = () => {
             {!isConfigured && (
               <div className="config-status">
                 <span>⚠️</span>
-                <span>请先在设置中配置 API Key</span>
+                <span>{i18n.configRequired}</span>
               </div>
             )}
             <ChatPanel isConfigured={isConfigured} />
@@ -64,7 +73,10 @@ const App: React.FC = () => {
         )}
         {activeTab === "plan" && <PlanPanel isConfigured={isConfigured} />}
         {activeTab === "settings" && (
-          <SettingsPanel onSaved={handleSettingsSaved} />
+          <SettingsPanel
+            onSaved={handleSettingsSaved}
+            onLanguageChange={handleLanguageChange}
+          />
         )}
       </main>
     </div>

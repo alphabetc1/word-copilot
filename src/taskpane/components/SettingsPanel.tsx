@@ -26,9 +26,11 @@ import {
   loadUserRules,
   saveUserRules,
 } from "../../helpers/settings";
+import { t, Language, getLanguage, saveLanguage } from "../../helpers/i18n";
 
 interface SettingsPanelProps {
   onSaved?: () => void;
+  onLanguageChange?: () => void;
 }
 
 type StatusType = "success" | "error" | "testing" | "saving";
@@ -92,12 +94,14 @@ async function testConnection(config: ModelConfig): Promise<{ success: boolean; 
   }
 }
 
-const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
+const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange }) => {
   const [modelConfig, setModelConfig] = useState<ModelConfig>(DEFAULT_MODEL_CONFIG);
   const [userRules, setUserRules] = useState<UserRules>(DEFAULT_USER_RULES);
   const [status, setStatus] = useState<Status | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [customModelInput, setCustomModelInput] = useState("");
+  const [uiLanguage, setUiLanguage] = useState<Language>(getLanguage());
+  const i18n = t();
 
   // Determine if current model is a preset or custom
   const selectedModelId = useMemo(() => {
@@ -209,14 +213,49 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
     }
   };
 
+  const handleLanguageChange = (lang: Language) => {
+    setUiLanguage(lang);
+    saveLanguage(lang);
+    onLanguageChange?.();
+  };
+
   return (
     <div className="settings-panel">
+      {/* UI Language Selection */}
+      <section className="settings-section">
+        <h3>🌐 {i18n.settingsUILanguage}</h3>
+        <div className="form-group">
+          <div className="radio-group">
+            <label className={`radio-option ${uiLanguage === "zh-CN" ? "selected" : ""}`}>
+              <input
+                type="radio"
+                name="uiLanguage"
+                value="zh-CN"
+                checked={uiLanguage === "zh-CN"}
+                onChange={() => handleLanguageChange("zh-CN")}
+              />
+              简体中文
+            </label>
+            <label className={`radio-option ${uiLanguage === "en-US" ? "selected" : ""}`}>
+              <input
+                type="radio"
+                name="uiLanguage"
+                value="en-US"
+                checked={uiLanguage === "en-US"}
+                onChange={() => handleLanguageChange("en-US")}
+              />
+              English
+            </label>
+          </div>
+        </div>
+      </section>
+
       {/* Model Configuration */}
       <section className="settings-section">
-        <h3>🤖 模型配置</h3>
+        <h3>{i18n.settingsModelConfig}</h3>
 
         <div className="form-group">
-          <label>Base URL</label>
+          <label>{i18n.settingsBaseUrl}</label>
           <input
             type="text"
             value={modelConfig.baseUrl}
@@ -229,7 +268,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>API Key</label>
+          <label>{i18n.settingsApiKey}</label>
           <input
             type="password"
             value={modelConfig.apiKey}
@@ -242,7 +281,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>模型</label>
+          <label>{i18n.settingsModel}</label>
           <select
             className="model-select"
             value={selectedModelId}
@@ -272,8 +311,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
                 ))}
               </optgroup>
             ))}
-            <optgroup label="其他">
-              <option value={CUSTOM_MODEL_ID}>自定义模型...</option>
+            <optgroup label={uiLanguage === "zh-CN" ? "其他" : "Other"}>
+              <option value={CUSTOM_MODEL_ID}>{i18n.settingsCustomModel}</option>
             </optgroup>
           </select>
 
@@ -287,7 +326,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
                 setCustomModelInput(e.target.value);
                 setModelConfig({ ...modelConfig, model: e.target.value });
               }}
-              placeholder="输入模型名称，如 llama-3.1-70b"
+              placeholder={i18n.settingsCustomModelPlaceholder}
               disabled={isProcessing}
             />
           )}
@@ -296,11 +335,11 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
 
       {/* User Rules */}
       <section className="settings-section">
-        <h3>📝 写作规则</h3>
+        <h3>{i18n.settingsWritingRules}</h3>
 
         {/* Scenario Selection */}
         <div className="form-group">
-          <label>写作场景</label>
+          <label>{i18n.settingsScenario}</label>
           <select
             className="scenario-select"
             value={userRules.scenario}
@@ -341,14 +380,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         {userRules.scenario !== "custom" && (
           <div className="preset-rules-info">
             <details>
-              <summary>查看当前场景预设规范</summary>
+              <summary>{i18n.settingsViewPreset}</summary>
               <pre>{SCENARIO_PRESETS[userRules.scenario].rulesText}</pre>
             </details>
           </div>
         )}
 
         <div className="form-group">
-          <label>风格 {userRules.scenario !== "custom" && <span className="preset-badge">预设</span>}</label>
+          <label>{i18n.settingsStyle} {userRules.scenario !== "custom" && <span className="preset-badge">{uiLanguage === "zh-CN" ? "预设" : "Preset"}</span>}</label>
           {renderRadioGroup<StyleOption>(
             "style",
             userRules.style,
@@ -358,7 +397,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>语气 {userRules.scenario !== "custom" && <span className="preset-badge">预设</span>}</label>
+          <label>{i18n.settingsTone} {userRules.scenario !== "custom" && <span className="preset-badge">{uiLanguage === "zh-CN" ? "预设" : "Preset"}</span>}</label>
           {renderRadioGroup<ToneOption>(
             "tone",
             userRules.tone,
@@ -368,7 +407,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>长度 {userRules.scenario !== "custom" && <span className="preset-badge">预设</span>}</label>
+          <label>{i18n.settingsLength} {userRules.scenario !== "custom" && <span className="preset-badge">{uiLanguage === "zh-CN" ? "预设" : "Preset"}</span>}</label>
           {renderRadioGroup<LengthOption>(
             "length",
             userRules.length,
@@ -378,7 +417,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>语言偏好 {userRules.scenario !== "custom" && <span className="preset-badge">预设</span>}</label>
+          <label>{i18n.settingsLanguage} {userRules.scenario !== "custom" && <span className="preset-badge">{uiLanguage === "zh-CN" ? "预设" : "Preset"}</span>}</label>
           {renderRadioGroup<LanguageOption>(
             "language",
             userRules.language,
@@ -388,13 +427,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>其他规则（自由文本）</label>
+          <label>{i18n.settingsCustomRules}</label>
           <textarea
             value={userRules.custom}
             onChange={(e) =>
               setUserRules({ ...userRules, custom: e.target.value })
             }
-            placeholder="例如：避免使用第一人称；不使用网络流行语；专业术语需保留英文..."
+            placeholder={i18n.settingsCustomRulesPlaceholder}
             disabled={isProcessing}
           />
         </div>
@@ -409,10 +448,10 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         {isProcessing ? (
           <>
             <span className="button-spinner" />
-            {status?.type === "testing" ? "测试连接中..." : "保存中..."}
+            {status?.type === "testing" ? i18n.settingsTesting : i18n.settingsSaving}
           </>
         ) : (
-          "保存设置"
+          i18n.settingsSave
         )}
       </button>
 
