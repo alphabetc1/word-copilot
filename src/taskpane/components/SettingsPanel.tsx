@@ -3,10 +3,14 @@ import { useState, useEffect } from "react";
 import {
   ModelConfig,
   UserRules,
+  ScenarioOption,
   StyleOption,
   ToneOption,
   LengthOption,
   LanguageOption,
+  SCENARIO_LABELS,
+  SCENARIO_DESCRIPTIONS,
+  SCENARIO_PRESETS,
   STYLE_LABELS,
   TONE_LABELS,
   LENGTH_LABELS,
@@ -227,8 +231,57 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
       <section className="settings-section">
         <h3>📝 写作规则</h3>
 
+        {/* Scenario Selection */}
         <div className="form-group">
-          <label>风格</label>
+          <label>写作场景</label>
+          <select
+            className="scenario-select"
+            value={userRules.scenario}
+            onChange={(e) => {
+              const newScenario = e.target.value as ScenarioOption;
+              if (newScenario === "custom") {
+                // Keep current settings when switching to custom
+                setUserRules({ ...userRules, scenario: newScenario });
+              } else {
+                // Apply preset rules for the selected scenario
+                const preset = SCENARIO_PRESETS[newScenario];
+                setUserRules({
+                  ...userRules,
+                  scenario: newScenario,
+                  style: preset.style,
+                  tone: preset.tone,
+                  length: preset.length,
+                  language: preset.language,
+                });
+              }
+            }}
+            disabled={isProcessing}
+          >
+            {(Object.entries(SCENARIO_LABELS) as [ScenarioOption, string][]).map(
+              ([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              )
+            )}
+          </select>
+          <p className="scenario-description">
+            {SCENARIO_DESCRIPTIONS[userRules.scenario]}
+          </p>
+        </div>
+
+        {/* Show preset rules info when not custom */}
+        {userRules.scenario !== "custom" && (
+          <div className="preset-rules-info">
+            <details>
+              <summary>查看当前场景预设规范</summary>
+              <pre>{SCENARIO_PRESETS[userRules.scenario].rulesText}</pre>
+            </details>
+          </div>
+        )}
+
+        <div className="form-group">
+          <label>风格 {userRules.scenario !== "custom" && <span className="preset-badge">预设</span>}</label>
           {renderRadioGroup<StyleOption>(
             "style",
             userRules.style,
@@ -238,7 +291,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>语气</label>
+          <label>语气 {userRules.scenario !== "custom" && <span className="preset-badge">预设</span>}</label>
           {renderRadioGroup<ToneOption>(
             "tone",
             userRules.tone,
@@ -248,7 +301,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>长度</label>
+          <label>长度 {userRules.scenario !== "custom" && <span className="preset-badge">预设</span>}</label>
           {renderRadioGroup<LengthOption>(
             "length",
             userRules.length,
@@ -258,7 +311,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved }) => {
         </div>
 
         <div className="form-group">
-          <label>语言偏好</label>
+          <label>语言偏好 {userRules.scenario !== "custom" && <span className="preset-badge">预设</span>}</label>
           {renderRadioGroup<LanguageOption>(
             "language",
             userRules.language,

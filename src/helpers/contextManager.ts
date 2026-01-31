@@ -9,6 +9,8 @@ import {
   TONE_LABELS,
   LENGTH_LABELS,
   LANGUAGE_LABELS,
+  SCENARIO_LABELS,
+  SCENARIO_PRESETS,
 } from "../types/settings";
 
 /**
@@ -157,13 +159,29 @@ export class ContextManager {
 export function formatUserRules(rules: UserRules): string {
   const lines: string[] = [];
 
+  // Add scenario info
+  const scenario = rules.scenario || "custom";
+  lines.push(`场景：${SCENARIO_LABELS[scenario]}`);
+
+  // Add basic preferences
   lines.push(`风格：${STYLE_LABELS[rules.style]}`);
   lines.push(`语气：${TONE_LABELS[rules.tone]}`);
   lines.push(`长度：${LENGTH_LABELS[rules.length]}`);
   lines.push(`语言：${LANGUAGE_LABELS[rules.language]}`);
 
+  // Add preset rules if using a non-custom scenario
+  if (scenario !== "custom") {
+    const preset = SCENARIO_PRESETS[scenario];
+    if (preset && preset.rulesText) {
+      lines.push("");
+      lines.push(preset.rulesText);
+    }
+  }
+
+  // Add custom rules if provided
   if (rules.custom && rules.custom.trim()) {
-    lines.push(`其他：${rules.custom.trim()}`);
+    lines.push("");
+    lines.push(`其他要求：${rules.custom.trim()}`);
   }
 
   return lines.join("\n");
