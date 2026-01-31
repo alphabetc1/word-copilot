@@ -27,6 +27,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // AbortController for cancelling requests
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Restore messages when component mounts (e.g., after tab switch)
   useEffect(() => {
@@ -41,6 +44,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Cancel current request
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  };
+
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading || !isConfigured) return;
 
@@ -48,6 +59,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
     setInputValue("");
     setIsLoading(true);
 
+    // Create new AbortController for this request
+    abortControllerRef.current = new AbortController();
     const contextManager = contextManagerRef.current;
 
     try {
@@ -89,6 +102,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         messages: contextManager.getMessages(),
         tools: TOOL_DEFINITIONS,
         toolChoice: "auto",
+        abortController: abortControllerRef.current!,
       });
 
       // If 400 error, might be tools not supported, retry without tools
@@ -98,6 +112,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
           config,
           systemPrompt: SYSTEM_PROMPT,
           messages: contextManager.getMessages(),
+          abortController: abortControllerRef.current!,
           // No tools - for models that don't support function calling
         });
       }
@@ -154,6 +169,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
       setMessages([...contextManager.getDisplayMessages()]);
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -190,6 +206,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
           <div className="loading">
             <div className="loading-spinner" />
             <span>AI 正在思考...</span>
+            <button className="cancel-button" onClick={handleCancel}>
+              停止
+            </button>
           </div>
         )}
 

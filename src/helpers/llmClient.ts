@@ -22,6 +22,8 @@ export interface SendChatParams {
   toolChoice?: "auto" | "none" | "required";
   temperature?: number;
   maxTokens?: number;
+  /** External AbortController for cancellation support */
+  abortController?: AbortController;
 }
 
 /**
@@ -88,6 +90,7 @@ export async function sendChat(params: SendChatParams): Promise<ChatResult> {
     toolChoice = "auto",
     temperature = 0.7,
     maxTokens = 4096,
+    abortController: externalController,
   } = params;
 
   // Validate config
@@ -125,7 +128,12 @@ export async function sendChat(params: SendChatParams): Promise<ChatResult> {
   const endpoint = buildEndpoint(config.baseUrl);
   console.log("Sending request to:", endpoint);
   console.log("Request body (truncated):", JSON.stringify(requestBody, null, 2).substring(0, 500));
-  const { controller, timeoutId } = createTimeoutController(DEFAULT_TIMEOUT);
+
+  // Use external controller if provided, otherwise create one with timeout
+  const useExternalController = !!externalController;
+  const { controller, timeoutId } = useExternalController
+    ? { controller: externalController, timeoutId: null }
+    : createTimeoutController(DEFAULT_TIMEOUT);
 
   try {
     const response = await fetch(endpoint, {
@@ -138,7 +146,7 @@ export async function sendChat(params: SendChatParams): Promise<ChatResult> {
       signal: controller.signal,
     });
 
-    clearTimeout(timeoutId);
+    if (timeoutId) clearTimeout(timeoutId);
 
     // Handle non-OK responses
     if (!response.ok) {
@@ -185,10 +193,14 @@ export async function sendChat(params: SendChatParams): Promise<ChatResult> {
         : undefined,
     };
   } catch (error) {
-    clearTimeout(timeoutId);
+    if (timeoutId) clearTimeout(timeoutId);
 
     if (error instanceof Error) {
       if (error.name === "AbortError") {
+        // Check if it was user-initiated cancellation or timeout
+        if (useExternalController) {
+          return { success: false, error: "已取消请求" };
+        }
         return { success: false, error: "Request timed out" };
       }
       return { success: false, error: `Network error: ${error.message}` };
