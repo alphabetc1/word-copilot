@@ -216,6 +216,7 @@ word-copilot/
 │   │   ├── wordBridge.ts        # Word document operations
 │   │   ├── sessionManager.ts    # Session management
 │   │   ├── i18n.ts              # Internationalization
+│   │   ├── voiceInput.ts        # Voice input (experimental)
 │   │   └── ...
 │   ├── 📁 types/                # TypeScript definitions
 │   └── 📁 __tests__/            # Unit tests
