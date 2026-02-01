@@ -47,22 +47,49 @@ export async function replaceSelection(
   useTrackChanges: boolean = true
 ): Promise<void> {
   return Word.run(async (context) => {
-    // Enable track changes mode if requested
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let originalMode: any = null;
+    let shouldRestore = false;
+
+    // Save and set track changes mode if requested
     if (useTrackChanges) {
       try {
-        // Set change tracking mode to track all changes
-        // This marks deletions with strikethrough and insertions with underline
+        // Load current tracking mode to restore later
+        context.document.load("changeTrackingMode");
+        await context.sync();
+        originalMode = context.document.changeTrackingMode;
+        shouldRestore = true;
+
+        // Enable track all mode for this operation
         context.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll;
         await context.sync();
       } catch (e) {
         // Track changes might not be supported in all versions
         console.warn("Track changes not supported, falling back to direct replace:", e);
+        shouldRestore = false;
       }
     }
 
-    const selection = context.document.getSelection();
-    selection.insertText(content, Word.InsertLocation.replace);
-    await context.sync();
+    try {
+      // Perform the replacement
+      const selection = context.document.getSelection();
+      selection.load("text");
+      await context.sync();
+
+      selection.insertText(content, Word.InsertLocation.replace);
+      await context.sync();
+    } finally {
+      // Restore original tracking mode (turn off if it was off)
+      if (shouldRestore && originalMode !== null) {
+        try {
+          context.document.changeTrackingMode = originalMode;
+          await context.sync();
+        } catch (e) {
+          // Ignore restore errors
+          console.warn("Failed to restore tracking mode:", e);
+        }
+      }
+    }
   });
 }
 
