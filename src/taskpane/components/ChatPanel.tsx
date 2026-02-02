@@ -14,8 +14,7 @@ import {
 } from "../../helpers/toolExecutor";
 import { getSelectionText, getDocumentText } from "../../helpers/wordBridge";
 import { analyzeDocumentStructure } from "../../helpers/structureAnalyzer";
-import { getVoiceController, isSpeechRecognitionSupported } from "../../helpers/voiceInput";
-import { t, getLanguage } from "../../helpers/i18n";
+import { t } from "../../helpers/i18n";
 import MessageItem from "./MessageItem";
 import SessionList from "./SessionList";
 
@@ -38,7 +37,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSessionList, setShowSessionList] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // AbortController for cancelling requests
@@ -47,8 +45,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   const activeRequestIdRef = useRef<number | null>(null);
   const sendInProgressRef = useRef(false);
 
-  // Voice input support check
-  const voiceSupported = isSpeechRecognitionSupported();
   const i18n = t();
 
   // Show toast notification
@@ -68,59 +64,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
   const requiresSelection = (input: string): boolean => {
     return selectionRequiredRegex.test(input);
-  };
-
-  // Voice input handler
-  const handleVoiceInput = () => {
-    if (!voiceSupported) {
-      showToast(i18n.voiceNotSupported, "error");
-      return;
-    }
-
-    const controller = getVoiceController();
-
-    // Set language based on current i18n setting
-    controller.setLanguage(getLanguage());
-
-    if (isListening) {
-      controller.stop();
-      setIsListening(false);
-      return;
-    }
-
-    const success = controller.start({
-      onResult: (result) => {
-        // Append transcript to input
-        setInputValue((prev) => {
-          // If final, replace last interim result; otherwise append
-          if (result.isFinal) {
-            // Just append final result
-            return prev + result.transcript;
-          }
-          return prev;
-        });
-      },
-      onError: (error, message) => {
-        console.error("Voice input error:", error, message);
-        if (error === "permission-denied") {
-          showToast(i18n.voicePermissionDenied, "error");
-        } else if (error !== "aborted" && error !== "no-speech") {
-          showToast(`${i18n.error}: ${message}`, "error");
-        }
-        setIsListening(false);
-      },
-      onStart: () => {
-        setIsListening(true);
-        showToast(i18n.voiceListening);
-      },
-      onEnd: () => {
-        setIsListening(false);
-      },
-    });
-
-    if (!success) {
-      setIsListening(false);
-    }
   };
 
   // Refresh sessions list
@@ -492,17 +435,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
             }
             disabled={isLoading || !isConfigured}
           />
-          {/* Voice Input Button - Experimental */}
-          {voiceSupported && (
-            <button
-              className={`voice-button ${isListening ? "listening" : ""}`}
-              onClick={handleVoiceInput}
-              disabled={isLoading || !isConfigured}
-              title={isListening ? i18n.voiceStop : i18n.voiceStart}
-            >
-              {isListening ? "⏹️" : "🎤"}
-            </button>
-          )}
           <button
             className="send-button"
             onClick={handleSend}
