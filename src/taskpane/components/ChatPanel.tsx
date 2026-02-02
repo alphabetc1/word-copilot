@@ -416,13 +416,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
       {/* Input Area */}
       <div className="input-area">
-        {messages.length > 0 && (
-          <div style={{ marginBottom: 8, textAlign: "right" }}>
-            <button className="clear-button" onClick={handleClear}>
-              {i18n.chatEmpty}
-            </button>
-          </div>
-        )}
         <div className="input-row">
           <textarea
             value={inputValue}
