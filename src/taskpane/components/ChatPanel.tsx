@@ -38,6 +38,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   const [showSessionList, setShowSessionList] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // AbortController for cancelling requests
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -46,6 +47,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   const sendInProgressRef = useRef(false);
 
   const i18n = t();
+
+  // Scroll to top/bottom functions
+  const scrollToTop = () => {
+    messagesContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Show toast notification
   const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -382,7 +392,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
       )}
 
       {/* Messages Area */}
-      <div className="messages-container">
+      <div className="messages-container" ref={messagesContainerRef}>
         {messages.length === 0 ? (
           <div className="empty-state">
             <h3>{i18n.chatEmpty}</h3>
@@ -412,6 +422,26 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         )}
 
         <div ref={messagesEndRef} />
+
+        {/* Scroll Navigation Buttons */}
+        {messages.length > 0 && (
+          <div className="scroll-nav">
+            <button
+              className="scroll-nav-btn scroll-to-top"
+              onClick={scrollToTop}
+              title="回到顶部"
+            >
+              ⬆
+            </button>
+            <button
+              className="scroll-nav-btn scroll-to-bottom"
+              onClick={scrollToBottom}
+              title="跳到底部"
+            >
+              ⬇
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Input Area */}
