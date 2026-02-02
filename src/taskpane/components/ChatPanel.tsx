@@ -43,6 +43,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
   // AbortController for cancelling requests
   const abortControllerRef = useRef<AbortController | null>(null);
+  const requestIdRef = useRef(0);
+  const activeRequestIdRef = useRef<number | null>(null);
+  const sendInProgressRef = useRef(false);
 
   // Voice input support check
   const voiceSupported = isSpeechRecognitionSupported();
@@ -52,6 +55,19 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   const showToast = (message: string, type: "success" | "error" = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 2000);
+  };
+
+  const actionIntentRegex =
+    /(润色|改写|改为|改成|翻译|翻譯|删除|删掉|替换|插入|补充|添加|批注|comment|translate|polish|rewrite|rephrase|improve|edit|fix|remove|delete|insert|add)/i;
+  const selectionRequiredRegex =
+    /(选中|选区|selected|selection|润色|改写|翻译|翻譯|替换|删除|批注|comment|polish|rewrite|rephrase|translate|remove|delete)/i;
+
+  const shouldForceToolCall = (input: string): boolean => {
+    return actionIntentRegex.test(input);
+  };
+
+  const requiresSelection = (input: string): boolean => {
+    return selectionRequiredRegex.test(input);
   };
 
   // Voice input handler
@@ -167,11 +183,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
   };
 
   const handleSend = async () => {
-    if (!inputValue.trim() || isLoading || !isConfigured) return;
+    if (!inputValue.trim() || isLoading || !isConfigured || sendInProgressRef.current) return;
 
     const userInput = inputValue.trim();
     setInputValue("");
     setIsLoading(true);
+    sendInProgressRef.current = true;
+    const requestId = ++requestIdRef.current;
+    activeRequestIdRef.current = requestId;
 
     // Create new AbortController for this request
     abortControllerRef.current = new AbortController();
@@ -187,6 +206,24 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         documentText = await getDocumentText(5000);
       } catch (error) {
         console.warn("Could not get Word context:", error);
+      }
+
+      if (activeRequestIdRef.current !== requestId) {
+        return;
+      }
+
+      const selectionText = selection.trim();
+      const shouldRequireSelection = requiresSelection(userInput);
+      if (shouldRequireSelection && !selectionText) {
+        sm.addDisplayMessage(
+          "assistant",
+          "未检测到选中内容，请先选中文本再执行该操作。",
+          undefined,
+          true
+        );
+        setMessages(sm.getDisplayMessages());
+        refreshSessions();
+        return;
       }
 
       // Load settings
@@ -207,34 +244,65 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
       sm.addDisplayMessage("user", userInput);
       setMessages(sm.getDisplayMessages());
 
-      // Send to LLM
-      let result = await sendChat({
-        config,
-        systemPrompt: SYSTEM_PROMPT,
-        messages: sm.getMessages(),
-        tools: TOOL_DEFINITIONS,
-        toolChoice: "auto",
-        abortController: abortControllerRef.current!,
-      });
-
-      // If 400 error, might be tools not supported, retry without tools
-      if (!result.success && result.error?.includes("400")) {
-        console.warn("Retrying without tools due to 400 error");
-        result = await sendChat({
+      const requestChatWithTools = async (toolChoice: "auto" | "required") => {
+        let result = await sendChat({
           config,
           systemPrompt: SYSTEM_PROMPT,
           messages: sm.getMessages(),
+          tools: TOOL_DEFINITIONS,
+          toolChoice,
           abortController: abortControllerRef.current!,
         });
+
+        if (!result.success && result.error?.includes("400") && toolChoice === "auto") {
+          console.warn("Retrying without tools due to 400 error");
+          result = await sendChat({
+            config,
+            systemPrompt: SYSTEM_PROMPT,
+            messages: sm.getMessages(),
+            abortController: abortControllerRef.current!,
+          });
+        }
+
+        return result;
+      };
+
+      // Send to LLM
+      let result = await requestChatWithTools("auto");
+
+      if (activeRequestIdRef.current !== requestId) {
+        return;
       }
 
       if (!result.success || !result.message) {
         throw new Error(result.error || "Failed to get response from AI");
       }
 
+      let message = result.message;
+      const needsToolCall = shouldForceToolCall(userInput);
+      if (needsToolCall && !hasToolCalls(message)) {
+        const retryResult = await requestChatWithTools("required");
+        if (
+          retryResult.success &&
+          retryResult.message &&
+          hasToolCalls(retryResult.message)
+        ) {
+          result = retryResult;
+          message = retryResult.message;
+        } else {
+          const errorText =
+            retryResult.error ||
+            "未能触发文档操作工具，请重试或简化指令。";
+          sm.addDisplayMessage("assistant", errorText, undefined, true);
+          setMessages(sm.getDisplayMessages());
+          refreshSessions();
+          return;
+        }
+      }
+
       // Handle tool calls if present
-      if (hasToolCalls(result.message)) {
-        const toolCalls = result.message.tool_calls!;
+      if (hasToolCalls(message)) {
+        const toolCalls = message.tool_calls!;
 
         // Execute tool calls
         const toolResults = await executeToolCalls(toolCalls);
@@ -249,24 +317,24 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
         );
 
         // Add natural language response if present
-        if (result.message.content) {
+        if (message.content) {
           sm.addMessage({
             role: "assistant",
-            content: result.message.content,
+            content: message.content,
           });
-          sm.addDisplayMessage("assistant", result.message.content);
+          sm.addDisplayMessage("assistant", message.content);
         } else {
           sm.addMessage({
             role: "assistant",
             content: `[已执行操作: ${toolResultText}]`,
           });
         }
-      } else if (result.message.content) {
+      } else if (message.content) {
         sm.addMessage({
           role: "assistant",
-          content: result.message.content,
+          content: message.content,
         });
-        sm.addDisplayMessage("assistant", result.message.content);
+        sm.addDisplayMessage("assistant", message.content);
       }
 
       setMessages(sm.getDisplayMessages());
@@ -277,8 +345,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
       sm.addDisplayMessage("assistant", errorMessage, undefined, true);
       setMessages(sm.getDisplayMessages());
     } finally {
-      setIsLoading(false);
-      abortControllerRef.current = null;
+      if (activeRequestIdRef.current === requestId) {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+        sendInProgressRef.current = false;
+        activeRequestIdRef.current = null;
+      }
     }
   };
 
