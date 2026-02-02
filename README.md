@@ -60,7 +60,7 @@
 node -v
 npm -v
 
-# 1️⃣ 克隆项目并安装依赖
+# 1️⃣ 克隆项目并安装依赖（首次需要）
 git clone https://github.com/your-repo/word-copilot.git
 cd word-copilot
 npm install
@@ -68,17 +68,18 @@ npm install
 # 2️⃣ 安装开发证书（首次需要，会提示输入系统密码）
 npm run dev:certs
 
-# 3️⃣ 将插件加载到 Word
+# 3️⃣ 将插件加载到 Word（首次需要）
 npm run sideload:mac
 
-# 4️⃣ 启动开发服务器
+# 4️⃣ 启动开发服务器（每次开发都需要保持运行）
 npm run dev
 
-# 5️⃣ 重启 Word
+# 5️⃣ 重启 Word（首次需要）
 # ⚠️ 必须完全退出 Word (Cmd+Q)，然后重新打开
-
-# 6️⃣ 加载插件
-# 打开 Word → 插入 → 加载项 → 我的加载项 → 选择 Word Copilot
+#
+# 6️⃣ 打开插件入口
+# - Ribbon：切换到「Word Copilot」选项卡
+# - 或：选中文本后右键 → 「Word Copilot」
 ```
 
 ### 方式三：本地开发安装（Windows）
@@ -87,10 +88,10 @@ npm run dev
 # 1️⃣ 安装依赖
 npm install
 
-# 2️⃣ 启动开发服务器
+# 2️⃣ 启动开发服务器（每次开发都需要保持运行）
 npm run dev
 
-# 3️⃣ 在 Word 中加载插件
+# 3️⃣ 在 Word 中加载插件（首次需要）
 # 打开 Word → 插入 → 获取加载项 → 我的加载项 → 上传我的加载项 → 选择 manifest.xml
 ```
 
@@ -194,6 +195,7 @@ npm run test          # 运行测试
 npm run test:watch    # 监听模式运行测试
 npm run test:coverage # 生成覆盖率报告
 npm run validate      # 验证 manifest.xml
+npm run validate:prod # 验证 manifest-prod.xml
 ```
 
 ## 📁 项目结构
@@ -201,7 +203,7 @@ npm run validate      # 验证 manifest.xml
 ```
 word-copilot/
 ├── 📄 manifest.xml              # Office 插件配置清单（开发用）
-├── 📄 manifest-prod.xml         # 生产环境清单（GitHub Pages）
+├── 📄 manifest-prod.xml         # 生产环境清单（GitHub Pages 示例）
 ├── 📄 package.json              # 项目依赖和脚本
 ├── 📄 jest.config.js            # 测试配置
 ├── 📁 .github/workflows/        # GitHub Actions CI/CD
@@ -237,6 +239,17 @@ word-copilot/
 2. 确保已运行 `npm run sideload:mac`
 3. 完全退出 Word (Cmd+Q)，然后重新打开
 4. 开发服务器必须保持运行 (`npm run dev`)
+</details>
+
+<details>
+<summary><b>安装了 EndNote 后，Word Copilot 按钮“消失”了？</b></summary>
+
+这通常不是卸载/冲突，而是 **Ribbon 空间不足被挤到别处**：
+
+1. 在 Ribbon 顶部找一下是否有 **「Word Copilot」** 选项卡（本项目默认放在独立 Tab，避免被 Home 挤没）
+2. 或者选中文本后右键，查看是否有 **「Word Copilot」** 菜单
+3. 如果你使用的是旧版 manifest（把按钮放在 Home），请把 Word 窗口拉宽，或在 Ribbon 右侧的溢出/更多菜单里找一下
+
 </details>
 
 <details>

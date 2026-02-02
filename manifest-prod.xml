@@ -13,9 +13,9 @@
   <DefaultLocale>zh-CN</DefaultLocale>
   <DisplayName DefaultValue="Word Copilot"/>
   <Description DefaultValue="AI-powered writing assistant for Microsoft Word"/>
-  <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png"/>
-  <SupportUrl DefaultValue="https://github.com/your-repo/word-copilot"/>
+  <IconUrl DefaultValue="https://alphabetc1.github.io/word-copilot/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://alphabetc1.github.io/word-copilot/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="https://github.com/alphabetc1/word-copilot"/>
 
   <!-- Hosts -->
   <Hosts>
@@ -31,7 +31,7 @@
 
   <!-- Default Settings -->
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://localhost:3000/taskpane.html"/>
+    <SourceLocation DefaultValue="https://alphabetc1.github.io/word-copilot/taskpane.html"/>
   </DefaultSettings>
 
   <!-- Permissions -->
@@ -200,13 +200,13 @@
     <!-- Resources -->
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://alphabetc1.github.io/word-copilot/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://alphabetc1.github.io/word-copilot/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://alphabetc1.github.io/word-copilot/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/taskpane.html"/>
-        <bt:Url id="Commands.Url" DefaultValue="https://localhost:3000/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://alphabetc1.github.io/word-copilot/taskpane.html"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://alphabetc1.github.io/word-copilot/commands.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="WordCopilotTab.Label" DefaultValue="Word Copilot"/>
@@ -229,3 +229,4 @@
     </Resources>
   </VersionOverrides>
 </OfficeApp>
+
