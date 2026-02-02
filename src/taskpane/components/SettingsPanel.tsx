@@ -476,6 +476,16 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
         </div>
       </section>
 
+      {/* Status Message */}
+      {status && (
+        <div className={getStatusClassName()} role="status" aria-live="polite">
+          {(status.type === "testing" || status.type === "saving") && (
+            <span className="status-spinner" />
+          )}
+          {status.message}
+        </div>
+      )}
+
       {/* Save Button */}
       <button
         className={`save-button ${isProcessing ? "processing" : ""}`}
@@ -491,16 +501,6 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSaved, onLanguageChange
           i18n.settingsSave
         )}
       </button>
-
-      {/* Status Message */}
-      {status && (
-        <div className={getStatusClassName()}>
-          {(status.type === "testing" || status.type === "saving") && (
-            <span className="status-spinner" />
-          )}
-          {status.message}
-        </div>
-      )}
     </div>
   );
 };
