@@ -30,28 +30,31 @@
 | ⚡ **快捷命令** | 右键菜单一键润色、翻译、添加批注 |
 | 📊 **结构检查** | AI 分析文档结构，检查标题层级、引用规范等 |
 | 💾 **多会话管理** | 支持多个独立对话，历史记录本地保存 |
-| 🎤 **语音输入** | 实验性语音转文字输入支持 |
+| 🎤 **语音输入** | 语音转文字输入支持 |
 
 ## 🚀 快速开始
 
 ### 前置要求
 
-- [Node.js](https://nodejs.org/) 18.0 或更高版本
 - Microsoft Word 2016+ (Windows/Mac) 或 Word Online
 - 一个大模型 API Key（支持 OpenAI、Azure、阿里云通义等）
 
 ### 方式一：GitHub Pages（最简单 - 无需本地安装）
 
-使用托管在 GitHub Pages 上的预构建版本：
+1. **下载 manifest 文件**：[点击这里下载 word-copilot.xml](https://alphabetc1.github.io/word-copilot/word-copilot.xml)（右键 → 另存为）
+2. **安装到 Word（两种方式二选一）**
+   - **A. 手动上传（推荐）**：Word → **插入 → 加载项 → 我的加载项 → 上传我的加载项** → 选择下载的 `word-copilot.xml`
+   - **B. 手动sideload（当“上传我的加载项”不可用/被禁用时）**
+     - **macOS（固定目录 sideload）**
+       - 将下载好的`word-copilot.xml`拷贝到 **目标目录**：`~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
 
-1. **下载 manifest 文件**：[点击这里下载 manifest.xml](https://alphabetc1.github.io/word-copilot/manifest.xml)（右键 → 另存为）
-2. 在 Word 中：**插入 → 加载项 → 我的加载项 → 上传我的加载项**
-3. 选择下载的 `manifest.xml`
-4. 在插件设置中配置你的 API Key
+     - **Windows（Shared Folder Catalog sideload）**
+       - 将下载好的`word-copilot.xml`拷贝到 **目标目录**：`%USERPROFILE%\Documents\OfficeAddinManifests\word-copilot.xml`
+       - 然后你需要在 Word 里把该目录的共享路径配置为 Trusted Add-in Catalog，再从 **SHARED FOLDER** 安装（脚本会打印详细步骤）
 
-> **如果你 Fork 了本仓库**，需要用你自己的 GitHub Pages 地址：`https://<你的用户名>.github.io/word-copilot/manifest.xml`
+3. 在插件设置中配置你的 API Key
 
-### 方式二：本地开发安装（Mac）
+### 方式二：本地安装（Mac）
 
 ```bash
 # 如果没有 npm，需要下载并安装 node.js
@@ -60,46 +63,52 @@
 node -v
 npm -v
 
-# 1️⃣ 克隆项目并安装依赖（首次需要）
+# 1️⃣ 克隆项目并安装依赖
 git clone https://github.com/your-repo/word-copilot.git
 cd word-copilot
 npm install
 
-# 2️⃣ 安装开发证书（首次需要，会提示输入系统密码）
+# 2️⃣ 安装开发证书
 npm run dev:certs
 
-# 3️⃣ 将插件加载到 Word（首次需要）
+# 3️⃣ 将插件加载到 Word
 npm run sideload:mac
 
-# 4️⃣ 启动开发服务器（每次开发都需要保持运行）
-npm run dev
-
-# 5️⃣ 重启 Word（首次需要）
+# 3️⃣ 重启 Word
 # ⚠️ 必须完全退出 Word (Cmd+Q)，然后重新打开
 #
-# 6️⃣ 打开插件入口
+# 4️⃣ 打开插件入口
 # - Ribbon：切换到「Word Copilot」选项卡
 # - 或：选中文本后右键 → 「Word Copilot」
 ```
 
-### 方式三：本地开发安装（Windows）
+### 方式三：本地安装（Windows）
 
 ```bash
-# 1️⃣ 安装依赖
+# 1️⃣ 克隆项目并安装依赖
+git clone https://github.com/your-repo/word-copilot.git
+cd word-copilot
 npm install
 
-# 2️⃣ 启动开发服务器（每次开发都需要保持运行）
-npm run dev
-
-# 3️⃣ 在 Word 中加载插件（首次需要）
-# 打开 Word → 插入 → 获取加载项 → 我的加载项 → 上传我的加载项 → 选择 manifest.xml
+# 2️⃣ 将插件 sideload 到 Word
+npm run sideload:windows
 ```
 
-### 方式四：Word Online
+### 本地调试（可选）
+
+大部分情况下你只需要 `word-copilot.xml`（GitHub Pages 托管）。只有当你要调试本地代码时，才需要使用 `word-copilot-local.xml`：
 
 ```bash
-npm install && npm run dev
-# 在 Word Online: 插入 → 加载项 → 上传我的加载项 → 选择 manifest.xml
+# 1) 首次需要：安装开发证书
+npm run dev:certs
+
+# 2) sideload 本地 manifest（会覆盖 wef/catalog 里的 word-copilot.xml）
+npm run sideload:mac -- word-copilot-local.xml
+# Windows:
+# npm run sideload:windows -- word-copilot-local.xml
+
+# 3) 启动本地开发服务器（每次调试都需要保持运行）
+npm run dev
 ```
 
 ## ⚙️ 配置 API
@@ -194,16 +203,18 @@ npm run lint:fix      # 自动修复代码问题
 npm run test          # 运行测试
 npm run test:watch    # 监听模式运行测试
 npm run test:coverage # 生成覆盖率报告
-npm run validate      # 验证 manifest.xml
-npm run validate:prod # 验证 manifest-prod.xml
+npm run validate      # 验证 word-copilot-local.xml
+npm run validate:prod # 验证 word-copilot.xml
+npm run sideload:mac  # (macOS) copy manifest to wef folder
+npm run sideload:windows # (Windows) copy manifest to catalog folder + guide trust setup
 ```
 
 ## 📁 项目结构
 
 ```
 word-copilot/
-├── 📄 manifest.xml              # Office 插件配置清单（开发用）
-├── 📄 manifest-prod.xml         # 生产环境清单（GitHub Pages 示例）
+├── 📄 word-copilot.xml          # 生产环境清单（GitHub Pages / 默认使用）
+├── 📄 word-copilot-local.xml    # 本地调试清单（localhost:3000）
 ├── 📄 package.json              # 项目依赖和脚本
 ├── 📄 jest.config.js            # 测试配置
 ├── 📁 .github/workflows/        # GitHub Actions CI/CD

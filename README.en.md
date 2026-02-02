@@ -45,14 +45,31 @@
 
 Use the pre-built version hosted on GitHub Pages:
 
-1. **Download manifest file**: [Click here to download manifest.xml](https://alphabetc1.github.io/word-copilot/manifest.xml) (right-click → Save As)
-2. In Word: **Insert → Add-ins → My Add-ins → Upload My Add-in**
-3. Select the downloaded `manifest.xml`
+1. **Download manifest file**: [Click here to download word-copilot.xml](https://alphabetc1.github.io/word-copilot/word-copilot.xml) (right-click → Save As)
+2. Install into Word (choose one):
+   - **A. Upload (recommended)**: Word → **Insert → Add-ins → My Add-ins → Upload My Add-in** → select `word-copilot.xml`
+   - **B. Sideload (when Upload is disabled by policy)**
+     - **macOS**: copy to:
+       - Folder: `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
+       - File: `word-copilot.xml`
+
+```bash
+npm run sideload:mac -- word-copilot.xml
+```
+
+     - **Windows** (Shared Folder Catalog): the script copies to:
+       - `%USERPROFILE%\\Documents\\OfficeAddinManifests\\word-copilot.xml`
+       - then follow Trust Center → Trusted Add-in Catalogs → SHARED FOLDER steps printed by the script
+
+```bash
+npm run sideload:windows -- word-copilot.xml
+```
+
 4. Configure your API key in the add-in settings
 
-> **If you forked this repo**, use your own GitHub Pages URL: `https://<your-username>.github.io/word-copilot/manifest.xml`
+> **If you forked this repo**, use your own GitHub Pages URL: `https://<your-username>.github.io/word-copilot/word-copilot.xml`
 
-### Option 2: Local Development (Mac)
+### Option 2: Local Install (Mac)
 
 ```bash
 # Check Node.js installation
@@ -63,39 +80,42 @@ git clone https://github.com/your-repo/word-copilot.git
 cd word-copilot
 npm install
 
-# 2️⃣ Install development certificates (requires password)
-npm run dev:certs
-
-# 3️⃣ Sideload the add-in to Word
+# 2️⃣ Sideload to Word (default uses production manifest: word-copilot.xml)
 npm run sideload:mac
 
-# 4️⃣ Start the development server
-npm run dev
-
-# 5️⃣ Restart Word completely (Cmd+Q), then reopen
-
-# 6️⃣ Load the add-in
-# Word → Insert → Add-ins → My Add-ins → Select Word Copilot
+# 3️⃣ Restart Word completely (Cmd+Q), then reopen
+# 4️⃣ Ribbon: look for the "Word Copilot" tab
 ```
 
-### Option 3: Local Development (Windows)
+### Option 3: Local Install (Windows)
 
 ```bash
-# 1️⃣ Install dependencies
+# 1️⃣ Clone and install dependencies
+git clone https://github.com/your-repo/word-copilot.git
+cd word-copilot
 npm install
 
-# 2️⃣ Start development server
-npm run dev
+# 2️⃣ Sideload to Word (default uses production manifest: word-copilot.xml)
+npm run sideload:windows
+```
 
-# 3️⃣ Load add-in in Word
-# Word → Insert → Get Add-ins → My Add-ins → Upload My Add-in → Select manifest.xml
+### Local Debugging (Optional)
+
+Most of the time you only need `word-copilot.xml` (hosted on GitHub Pages). If you want to debug local code, use `word-copilot-local.xml`:
+
+```bash
+npm run dev:certs
+npm run sideload:mac -- word-copilot-local.xml
+# Windows:
+# npm run sideload:windows -- word-copilot-local.xml
+npm run dev
 ```
 
 ### Option 4: Word Online
 
 ```bash
 npm install && npm run dev
-# In Word Online: Insert → Add-ins → Upload My Add-in → Select manifest.xml
+# In Word Online: Insert → Add-ins → Upload My Add-in → Select word-copilot-local.xml (local) or word-copilot.xml (hosted)
 ```
 
 ## ⚙️ API Configuration
@@ -190,15 +210,16 @@ npm run lint:fix      # Auto-fix code issues
 npm run test          # Run tests
 npm run test:watch    # Run tests in watch mode
 npm run test:coverage # Generate coverage report
-npm run validate      # Validate manifest.xml
+npm run validate      # Validate word-copilot-local.xml
+npm run validate:prod # Validate word-copilot.xml
 ```
 
 ## 📁 Project Structure
 
 ```
 word-copilot/
-├── 📄 manifest.xml              # Office Add-in manifest (dev)
-├── 📄 manifest-prod.xml         # Production manifest (GitHub Pages)
+├── 📄 word-copilot.xml          # Production manifest (GitHub Pages / default)
+├── 📄 word-copilot-local.xml    # Local debugging manifest (localhost:3000)
 ├── 📄 package.json              # Dependencies and scripts
 ├── 📄 jest.config.js            # Test configuration
 ├── 📁 .github/workflows/        # GitHub Actions CI/CD

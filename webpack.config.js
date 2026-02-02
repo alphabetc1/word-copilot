@@ -54,8 +54,8 @@ module.exports = {
           noErrorOnMissing: true,
         },
         {
-          from: "manifest.xml",
-          to: "manifest.xml",
+          from: "word-copilot-local.xml",
+          to: "word-copilot-local.xml",
         },
       ],
     }),
