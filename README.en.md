@@ -30,7 +30,6 @@
 | ⚡ **Quick Commands** | Right-click menu for instant polish, translate, and annotate |
 | 📊 **Structure Check** | AI analyzes document structure, heading hierarchy, citations |
 | 💾 **Session Management** | Multiple independent conversations with local history |
-| 🎤 **Voice Input** | Experimental speech-to-text input support |
 | 🌐 **i18n** | Full English and Chinese language support |
 
 ## 🚀 Quick Start
@@ -239,7 +238,6 @@ word-copilot/
 │   │   ├── wordBridge.ts        # Word document operations
 │   │   ├── sessionManager.ts    # Session management
 │   │   ├── i18n.ts              # Internationalization
-│   │   ├── voiceInput.ts        # Voice input (experimental)
 │   │   └── ...
 │   ├── 📁 types/                # TypeScript definitions
 │   └── 📁 __tests__/            # Unit tests
@@ -273,15 +271,6 @@ Change Base URL in settings:
 - OpenAI: `https://api.openai.com`
 - Azure: `https://your-resource.openai.azure.com`
 - Alibaba: `https://dashscope.aliyuncs.com/compatible-mode/v1`
-</details>
-
-<details>
-<summary><b>Voice input not working?</b></summary>
-
-Voice input is an experimental feature. Requirements:
-- Modern browser with Web Speech API support
-- Microphone permissions granted
-- May not work in all Office environments
 </details>
 
 ## 🤝 Contributing

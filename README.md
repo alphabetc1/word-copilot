@@ -30,7 +30,6 @@
 | ⚡ **快捷命令** | 右键菜单一键润色、翻译、添加批注 |
 | 📊 **结构检查** | AI 分析文档结构，检查标题层级、引用规范等 |
 | 💾 **多会话管理** | 支持多个独立对话，历史记录本地保存 |
-| 🎤 **语音输入** | 语音转文字输入支持 |
 
 ## 🚀 快速开始
 
@@ -234,7 +233,6 @@ word-copilot/
 │   │   ├── wordBridge.ts        # Word 文档操作
 │   │   ├── sessionManager.ts    # 会话管理
 │   │   ├── i18n.ts              # 国际化
-│   │   ├── voiceInput.ts        # 语音输入（实验性）
 │   │   └── ...
 │   ├── 📁 types/                # TypeScript 类型定义
 │   └── 📁 __tests__/            # 单元测试
@@ -279,15 +277,6 @@ word-copilot/
 - OpenAI: `https://api.openai.com`
 - Azure: `https://your-resource.openai.azure.com`
 - 阿里云: `https://dashscope.aliyuncs.com/compatible-mode/v1`
-</details>
-
-<details>
-<summary><b>语音输入不工作？</b></summary>
-
-语音输入是实验性功能，需要：
-- 支持 Web Speech API 的现代浏览器
-- 已授予麦克风权限
-- 可能在某些 Office 环境中不可用
 </details>
 
 ## 🤝 贡献
