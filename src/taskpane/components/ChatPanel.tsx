@@ -50,7 +50,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isConfigured }) => {
 
   // Scroll to top/bottom functions
   const scrollToTop = () => {
-    messagesContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = 0;
+    }
   };
 
   const scrollToBottom = () => {

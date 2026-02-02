@@ -31,32 +31,38 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      {/* Header */}
-      <header className="app-header">
-        <h1>{i18n.appTitle}</h1>
-      </header>
+      {/* Floating Header - shows on hover or when triggered */}
+      <div className="floating-header-zone">
+        {/* Header */}
+        <header className="app-header">
+          <h1>{i18n.appTitle}</h1>
+        </header>
 
-      {/* Tab Navigation */}
-      <nav className="tab-nav">
-        <button
-          className={activeTab === "chat" ? "active" : ""}
-          onClick={() => setActiveTab("chat")}
-        >
-          {i18n.tabChat}
-        </button>
-        <button
-          className={activeTab === "plan" ? "active" : ""}
-          onClick={() => setActiveTab("plan")}
-        >
-          {i18n.tabPlan}
-        </button>
-        <button
-          className={activeTab === "settings" ? "active" : ""}
-          onClick={() => setActiveTab("settings")}
-        >
-          {i18n.tabSettings}
-        </button>
-      </nav>
+        {/* Tab Navigation */}
+        <nav className="tab-nav">
+          <button
+            className={activeTab === "chat" ? "active" : ""}
+            onClick={() => setActiveTab("chat")}
+          >
+            {i18n.tabChat}
+          </button>
+          <button
+            className={activeTab === "plan" ? "active" : ""}
+            onClick={() => setActiveTab("plan")}
+          >
+            {i18n.tabPlan}
+          </button>
+          <button
+            className={activeTab === "settings" ? "active" : ""}
+            onClick={() => setActiveTab("settings")}
+          >
+            {i18n.tabSettings}
+          </button>
+        </nav>
+      </div>
+
+      {/* Hover trigger zone at top */}
+      <div className="header-trigger-zone" />
 
       {/* Main Content */}
       <main className="main-content">
