@@ -9,6 +9,7 @@
     "build:dev": "webpack --mode development",
     "dev": "webpack serve --mode development",
     "dev:certs": "npx office-addin-dev-certs install",
+    "sideload": "node scripts/sideload.js",
     "sideload:mac": "node scripts/sideload-mac.js",
     "sideload:windows": "node scripts/sideload-windows.js",
     "start": "office-addin-debugging start word-copilot-local.xml",

@@ -49,9 +49,15 @@
 
      - **Windows（Shared Folder Catalog sideload）**
        - 将下载好的`word-copilot.xml`拷贝到 **目标目录**：`%USERPROFILE%\Documents\OfficeAddinManifests\word-copilot.xml`
-       - 然后你需要在 Word 里把该目录的共享路径配置为 Trusted Add-in Catalog，再从 **SHARED FOLDER** 安装（脚本会打印详细步骤）
-
-3. 在插件设置中配置你的 API Key
+     - 共享文件夹（截图式步骤）：
+       - 右键文件夹 → 属性 → 共享 → 共享 → 选择 `Everyone` → 权限选 **读取**
+       - 记录共享路径：`\\你的电脑名\OfficeAddinManifests`
+     - Trusted Catalog（截图式步骤）：
+       - Word → 文件 → 选项 → 信任中心 → 信任中心设置
+       - 受信任的加载项目录 → 添加 `\\你的电脑名\OfficeAddinManifests` → 勾选允许
+3. 完全退出 Word (Cmd+Q) 并重新打开
+4. 在 Word 中：插入 → 加载项 → 我的加载项，找到 **Word Copilot**
+5. 在插件设置中配置你的 API Key，点击保存
 
 ### 方式二：本地安装（Mac）
 
