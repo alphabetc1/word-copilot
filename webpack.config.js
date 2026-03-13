@@ -1,8 +1,35 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const fs = require("fs");
 
 const isDev = process.env.NODE_ENV !== "production";
+
+/**
+ * Resolve Office Add-in dev certs for HTTPS devServer.
+ * `office-addin-dev-certs install` places them under ~/.office-addin-dev-certs.
+ * Falls back to webpack-dev-server's built-in self-signed cert when not found.
+ */
+function getHttpsConfig() {
+  const home = process.env.HOME || process.env.USERPROFILE || "";
+  const certDir = path.join(home, ".office-addin-dev-certs");
+  const keyPath = path.join(certDir, "localhost.key");
+  const certPath = path.join(certDir, "localhost.crt");
+  const caPath = path.join(certDir, "ca.crt");
+
+  if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+    const httpsOpts = {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath),
+    };
+    if (fs.existsSync(caPath)) {
+      httpsOpts.ca = fs.readFileSync(caPath);
+    }
+    return httpsOpts;
+  }
+  // Fallback: let webpack-dev-server generate a self-signed cert
+  return true;
+}
 
 module.exports = {
   entry: {
@@ -13,6 +40,16 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].bundle.js",
     clean: true,
+    // Ensure compatibility with older WebViews (IE11/EdgeHTML on Windows)
+    environment: {
+      arrowFunction: false,
+      const: false,
+      destructuring: false,
+      forOf: false,
+      module: false,
+      optionalChaining: false,
+      templateLiteral: false,
+    },
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"],
@@ -65,7 +102,7 @@ module.exports = {
       directory: path.join(__dirname, "dist"),
     },
     port: 3000,
-    https: true,
+    https: getHttpsConfig(),
     headers: {
       "Access-Control-Allow-Origin": "*",
     },
