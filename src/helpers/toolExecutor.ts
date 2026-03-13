@@ -113,11 +113,17 @@ async function executeSingleToolCall(toolCall: ToolCall): Promise<ToolResult> {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const isGeneralException =
+      errorMessage.includes("GeneralException") ||
+      (error instanceof Error && error.name === "GeneralException");
+    const userMessage = isGeneralException
+      ? "执行失败: Word 文档操作冲突（GeneralException），请稍后重试或缩短选中内容"
+      : `执行失败: ${errorMessage}`;
     return {
       toolCallId: id,
       name: toolName,
       success: false,
-      message: `执行失败: ${errorMessage}`,
+      message: userMessage,
       error: errorMessage,
     };
   }

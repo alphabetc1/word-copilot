@@ -37,6 +37,13 @@ export async function getDocumentText(maxLength: number = 10000): Promise<string
 }
 
 /**
+ * Small delay helper for retry logic
+ */
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
  * Replace the current selection with new content using Track Changes
  * This enables revision mode so users can Accept/Reject changes
  * @param content The new text to replace selection with
@@ -46,51 +53,76 @@ export async function replaceSelection(
   content: string,
   useTrackChanges: boolean = true
 ): Promise<void> {
-  return Word.run(async (context) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let originalMode: any = null;
-    let shouldRestore = false;
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 500;
 
-    // Save and set track changes mode if requested
-    if (useTrackChanges) {
-      try {
-        // Load current tracking mode to restore later
-        context.document.load("changeTrackingMode");
-        await context.sync();
-        originalMode = context.document.changeTrackingMode;
-        shouldRestore = true;
-
-        // Enable track all mode for this operation
-        context.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll;
-        await context.sync();
-      } catch (e) {
-        // Track changes might not be supported in all versions
-        console.warn("Track changes not supported, falling back to direct replace:", e);
-        shouldRestore = false;
-      }
-    }
-
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      // Perform the replacement
-      const selection = context.document.getSelection();
-      selection.load("text");
-      await context.sync();
+      await Word.run(async (context) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let originalMode: any = null;
+        let shouldRestore = false;
 
-      selection.insertText(content, Word.InsertLocation.replace);
-      await context.sync();
-    } finally {
-      // Restore original tracking mode (turn off if it was off)
-      if (shouldRestore && originalMode !== null) {
-        try {
-          context.document.changeTrackingMode = originalMode;
-          await context.sync();
-        } catch (e) {
-          // Ignore restore errors
-          console.warn("Failed to restore tracking mode:", e);
+        // Save and set track changes mode if requested
+        if (useTrackChanges) {
+          try {
+            // Load current tracking mode to restore later
+            context.document.load("changeTrackingMode");
+            await context.sync();
+            originalMode = context.document.changeTrackingMode;
+            shouldRestore = true;
+
+            // Enable track all mode for this operation
+            context.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll;
+            await context.sync();
+          } catch (e) {
+            // Track changes might not be supported in all versions
+            console.warn("Track changes not supported, falling back to direct replace:", e);
+            shouldRestore = false;
+          }
         }
+
+        try {
+          // Perform the replacement
+          const selection = context.document.getSelection();
+          selection.load("text");
+          await context.sync();
+
+          selection.insertText(content, Word.InsertLocation.replace);
+          await context.sync();
+        } finally {
+          // Restore original tracking mode (turn off if it was off)
+          if (shouldRestore && originalMode !== null) {
+            try {
+              context.document.changeTrackingMode = originalMode;
+              await context.sync();
+            } catch (e) {
+              // Ignore restore errors
+              console.warn("Failed to restore tracking mode:", e);
+            }
+          }
+        }
+      });
+      // Success — exit retry loop
+      return;
+    } catch (error) {
+      const isGeneralException =
+        error instanceof Error &&
+        (error.message.includes("GeneralException") ||
+          error.name === "GeneralException" ||
+          (error as { code?: string }).code === "GeneralException");
+
+      if (isGeneralException && attempt < MAX_RETRIES) {
+        console.warn(
+          `replaceSelection attempt ${attempt} failed with GeneralException, retrying in ${RETRY_DELAY_MS}ms...`
+        );
+        await delay(RETRY_DELAY_MS * attempt);
+        continue;
       }
+      // Not a GeneralException or exhausted retries — rethrow
+      throw error;
     }
-  });
+  }
 }
 
 /**
@@ -114,47 +146,93 @@ export async function insertText(
   position: InsertPosition,
   content: string
 ): Promise<void> {
-  return Word.run(async (context) => {
-    let range: Word.Range;
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 500;
 
-    switch (position) {
-      case "before_selection":
-        range = context.document.getSelection();
-        range.insertText(content, Word.InsertLocation.before);
-        break;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      await Word.run(async (context) => {
+        let range: Word.Range;
 
-      case "after_selection":
-        range = context.document.getSelection();
-        range.insertText(content, Word.InsertLocation.after);
-        break;
+        switch (position) {
+          case "before_selection":
+            range = context.document.getSelection();
+            range.insertText(content, Word.InsertLocation.before);
+            break;
 
-      case "document_start":
-        range = context.document.body.getRange(Word.RangeLocation.start);
-        range.insertText(content + "\n\n", Word.InsertLocation.before);
-        break;
+          case "after_selection":
+            range = context.document.getSelection();
+            range.insertText(content, Word.InsertLocation.after);
+            break;
 
-      case "document_end":
-        range = context.document.body.getRange(Word.RangeLocation.end);
-        range.insertText("\n\n" + content, Word.InsertLocation.after);
-        break;
+          case "document_start":
+            range = context.document.body.getRange(Word.RangeLocation.start);
+            range.insertText(content + "\n\n", Word.InsertLocation.before);
+            break;
 
-      default:
-        throw new Error(`Unknown insert position: ${position}`);
+          case "document_end":
+            range = context.document.body.getRange(Word.RangeLocation.end);
+            range.insertText("\n\n" + content, Word.InsertLocation.after);
+            break;
+
+          default:
+            throw new Error(`Unknown insert position: ${position}`);
+        }
+
+        await context.sync();
+      });
+      return;
+    } catch (error) {
+      const isGeneralException =
+        error instanceof Error &&
+        (error.message.includes("GeneralException") ||
+          error.name === "GeneralException" ||
+          (error as { code?: string }).code === "GeneralException");
+
+      if (isGeneralException && attempt < MAX_RETRIES) {
+        console.warn(
+          `insertText attempt ${attempt} failed with GeneralException, retrying...`
+        );
+        await delay(RETRY_DELAY_MS * attempt);
+        continue;
+      }
+      throw error;
     }
-
-    await context.sync();
-  });
+  }
 }
 
 /**
  * Delete the current selection
  */
 export async function deleteSelection(): Promise<void> {
-  return Word.run(async (context) => {
-    const selection = context.document.getSelection();
-    selection.delete();
-    await context.sync();
-  });
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 500;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      await Word.run(async (context) => {
+        const selection = context.document.getSelection();
+        selection.delete();
+        await context.sync();
+      });
+      return;
+    } catch (error) {
+      const isGeneralException =
+        error instanceof Error &&
+        (error.message.includes("GeneralException") ||
+          error.name === "GeneralException" ||
+          (error as { code?: string }).code === "GeneralException");
+
+      if (isGeneralException && attempt < MAX_RETRIES) {
+        console.warn(
+          `deleteSelection attempt ${attempt} failed with GeneralException, retrying...`
+        );
+        await delay(RETRY_DELAY_MS * attempt);
+        continue;
+      }
+      throw error;
+    }
+  }
 }
 
 /**
@@ -162,16 +240,39 @@ export async function deleteSelection(): Promise<void> {
  * @param comment The comment text to add
  */
 export async function addCommentToSelection(comment: string): Promise<void> {
-  return Word.run(async (context) => {
-    const selection = context.document.getSelection();
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 500;
 
-    // Word.js API for comments
-    // Note: Comments API requires Word API 1.4+
-    const commentRange = selection.getRange();
-    commentRange.insertComment(comment);
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      await Word.run(async (context) => {
+        const selection = context.document.getSelection();
 
-    await context.sync();
-  });
+        // Word.js API for comments
+        // Note: Comments API requires Word API 1.4+
+        const commentRange = selection.getRange();
+        commentRange.insertComment(comment);
+
+        await context.sync();
+      });
+      return;
+    } catch (error) {
+      const isGeneralException =
+        error instanceof Error &&
+        (error.message.includes("GeneralException") ||
+          error.name === "GeneralException" ||
+          (error as { code?: string }).code === "GeneralException");
+
+      if (isGeneralException && attempt < MAX_RETRIES) {
+        console.warn(
+          `addCommentToSelection attempt ${attempt} failed with GeneralException, retrying...`
+        );
+        await delay(RETRY_DELAY_MS * attempt);
+        continue;
+      }
+      throw error;
+    }
+  }
 }
 
 /**
