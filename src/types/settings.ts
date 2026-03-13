@@ -75,7 +75,7 @@ export const DEFAULT_USER_RULES: UserRules = {
 export const DEFAULT_MODEL_CONFIG: ModelConfig = {
   baseUrl: "https://api.openai.com",
   apiKey: "",
-  model: "gpt-4o",
+  model: "gpt-5",
 };
 
 /**
@@ -91,21 +91,36 @@ export interface ModelPreset {
 
 export const COMMON_MODELS: ModelPreset[] = [
   // OpenAI
-  { id: "gpt-4o", name: "GPT-4o", apiName: "gpt-4o", provider: "OpenAI" },
-  { id: "gpt-4o-mini", name: "GPT-4o Mini", apiName: "gpt-4o-mini", provider: "OpenAI" },
-  { id: "gpt-4-turbo", name: "GPT-4 Turbo", apiName: "gpt-4-turbo", provider: "OpenAI" },
-  { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", apiName: "gpt-3.5-turbo", provider: "OpenAI" },
+  { id: "gpt-5", name: "GPT-5", apiName: "gpt-5", provider: "OpenAI" },
+  { id: "gpt-5-mini", name: "GPT-5 Mini", apiName: "gpt-5-mini", provider: "OpenAI" },
+  { id: "gpt-4.1", name: "GPT-4.1", apiName: "gpt-4.1", provider: "OpenAI" },
+  { id: "gpt-4.1-mini", name: "GPT-4.1 Mini", apiName: "gpt-4.1-mini", provider: "OpenAI" },
+  { id: "gpt-4.1-nano", name: "GPT-4.1 Nano", apiName: "gpt-4.1-nano", provider: "OpenAI" },
+  { id: "o3", name: "o3", apiName: "o3", provider: "OpenAI" },
+  { id: "o4-mini", name: "o4-mini", apiName: "o4-mini", provider: "OpenAI" },
   // Anthropic
-  { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", apiName: "claude-3-5-sonnet-20241022", provider: "Anthropic" },
-  { id: "claude-3-opus", name: "Claude 3 Opus", apiName: "claude-3-opus-20240229", provider: "Anthropic" },
-  { id: "claude-3-haiku", name: "Claude 3 Haiku", apiName: "claude-3-haiku-20240307", provider: "Anthropic" },
-  // Alibaba Cloud (DashScope)
+  { id: "claude-sonnet-4-6", name: "Claude Sonnet 4.6", apiName: "claude-sonnet-4-6-20260217", provider: "Anthropic" },
+  { id: "claude-opus-4-5", name: "Claude Opus 4.5", apiName: "claude-opus-4-5-20251101", provider: "Anthropic" },
+  { id: "claude-sonnet-4-5", name: "Claude Sonnet 4.5", apiName: "claude-sonnet-4-5-20241022", provider: "Anthropic" },
+  { id: "claude-haiku-4-5", name: "Claude Haiku 4.5", apiName: "claude-haiku-4-5-20241022", provider: "Anthropic" },
+  // Google
+  { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro", apiName: "gemini-2.5-pro", provider: "Google" },
+  { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", apiName: "gemini-2.5-flash", provider: "Google" },
+  // DeepSeek
+  { id: "deepseek-chat", name: "DeepSeek V3", apiName: "deepseek-chat", provider: "DeepSeek" },
+  { id: "deepseek-reasoner", name: "DeepSeek R1", apiName: "deepseek-reasoner", provider: "DeepSeek" },
+  // 智谱 (Zhipu AI / Z.ai)
+  { id: "glm-5", name: "GLM-5", apiName: "glm-5", provider: "智谱" },
+  { id: "glm-4.7", name: "GLM-4.7", apiName: "glm-4.7", provider: "智谱" },
+  { id: "glm-4.7-flash", name: "GLM-4.7 Flash", apiName: "glm-4.7-flash", provider: "智谱" },
+  // 阿里云 (DashScope)
+  { id: "qwen3.5-plus", name: "通义千问 3.5 Plus", apiName: "qwen3.5-plus", provider: "阿里云" },
+  { id: "qwen-max", name: "通义千问 Max", apiName: "qwen-max", provider: "阿里云" },
   { id: "qwen-plus", name: "通义千问 Plus", apiName: "qwen-plus", provider: "阿里云" },
   { id: "qwen-turbo", name: "通义千问 Turbo", apiName: "qwen-turbo", provider: "阿里云" },
-  { id: "qwen-max", name: "通义千问 Max", apiName: "qwen-max", provider: "阿里云" },
-  // DeepSeek
-  { id: "deepseek-chat", name: "DeepSeek Chat", apiName: "deepseek-chat", provider: "DeepSeek" },
-  { id: "deepseek-coder", name: "DeepSeek Coder", apiName: "deepseek-coder", provider: "DeepSeek" },
+  // MiniMax
+  { id: "minimax-m2.5", name: "MiniMax M2.5", apiName: "MiniMax-M2.5", provider: "MiniMax" },
+  { id: "minimax-m2.5-highspeed", name: "MiniMax M2.5 Highspeed", apiName: "MiniMax-M2.5-highspeed", provider: "MiniMax" },
 ];
 
 /**
