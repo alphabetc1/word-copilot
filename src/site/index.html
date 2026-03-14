@@ -11,29 +11,21 @@
     <style>
       :root {
         --bg: #f4efe6;
-        --bg-strong: #e9ddc8;
         --surface: rgba(255, 251, 244, 0.78);
-        --surface-strong: #fff9f0;
         --text: #15222d;
         --muted: #475564;
         --line: rgba(21, 34, 45, 0.12);
         --accent: #005f73;
         --accent-strong: #0a9396;
-        --accent-soft: #94d2bd;
-        --warning: #ca6702;
         --shadow: 0 24px 60px rgba(15, 33, 46, 0.12);
         --radius-xl: 28px;
-        --radius-lg: 20px;
         --radius-md: 14px;
-        --max-width: 1160px;
+        --max-width: 960px;
       }
 
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; margin: 0; }
 
       body {
-        margin: 0;
         font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif;
         color: var(--text);
         background:
@@ -42,427 +34,197 @@
           linear-gradient(180deg, #f8f3ea 0%, #f1ebdf 48%, #efe9dc 100%);
       }
 
-      a {
-        color: inherit;
-      }
+      a { color: inherit; }
 
       .shell {
         width: min(calc(100% - 32px), var(--max-width));
         margin: 0 auto;
       }
 
+      /* ── topbar ── */
       .topbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 16px;
         padding: 22px 0;
+        gap: 12px;
       }
-
       .brand {
         display: inline-flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
         font-weight: 700;
         letter-spacing: 0.02em;
       }
-
       .brand img {
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        box-shadow: 0 10px 24px rgba(10, 147, 150, 0.18);
+        width: 40px; height: 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(10, 147, 150, 0.16);
       }
-
       .nav {
         display: inline-flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
       }
-
-      .nav a,
-      .secondary-link {
-        padding: 10px 14px;
+      .nav a {
+        padding: 8px 14px;
         border: 1px solid var(--line);
         border-radius: 999px;
         text-decoration: none;
         color: var(--muted);
         background: rgba(255, 255, 255, 0.56);
+        font-size: 0.9rem;
         backdrop-filter: blur(12px);
+        transition: background 0.2s;
       }
+      .nav a:hover { background: rgba(255, 255, 255, 0.85); }
 
+      /* ── hero ── */
       .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-        gap: 28px;
-        padding: 26px 0 44px;
-        align-items: stretch;
+        text-align: center;
+        padding: 48px 0 40px;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(0, 95, 115, 0.08);
+        color: var(--accent);
+        font-size: 0.88rem;
+        font-weight: 700;
+      }
+      .hero h1 {
+        margin: 20px auto 16px;
+        max-width: 720px;
+        font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        font-family: Georgia, "Times New Roman", serif;
+      }
+      .hero p {
+        max-width: 580px;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.75;
+      }
+      .cta-group {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 28px 0 0;
+      }
+      .cta-primary, .cta-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 46px;
+        padding: 0 22px;
+        border-radius: 999px;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 0.95rem;
+      }
+      .cta-primary {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+        color: #fff;
+        box-shadow: 0 12px 28px rgba(0, 95, 115, 0.2);
+      }
+      .cta-secondary {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.72);
       }
 
-      .hero-copy,
-      .hero-demo,
-      .section-card {
+      /* ── features ── */
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        padding: 8px 0 40px;
+      }
+      .feat {
+        padding: 22px;
         border: 1px solid rgba(21, 34, 45, 0.08);
         border-radius: var(--radius-xl);
         background: var(--surface);
         backdrop-filter: blur(18px);
         box-shadow: var(--shadow);
       }
-
-      .hero-copy {
-        padding: 36px;
+      .feat h3 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
       }
-
-      .hero-copy h1 {
-        margin: 16px 0;
-        font-size: clamp(2.4rem, 6vw, 4.7rem);
-        line-height: 0.96;
-        letter-spacing: -0.05em;
-        font-family: Georgia, "Times New Roman", serif;
-      }
-
-      .eyebrow,
-      .label {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: rgba(0, 95, 115, 0.08);
-        color: var(--accent);
-        font-size: 0.9rem;
-        font-weight: 700;
-      }
-
-      .hero-copy p {
-        margin: 0 0 18px;
-        color: var(--muted);
-        font-size: 1.05rem;
-        line-height: 1.75;
-      }
-
-      .cta-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin: 28px 0 22px;
-      }
-
-      .cta-primary,
-      .cta-secondary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        min-height: 48px;
-        padding: 0 20px;
-        border-radius: 999px;
-        text-decoration: none;
-        font-weight: 700;
-      }
-
-      .cta-primary {
-        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-        color: #fff;
-        box-shadow: 0 16px 32px rgba(0, 95, 115, 0.22);
-      }
-
-      .cta-secondary {
-        border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.72);
-      }
-
-      .hero-points {
-        display: grid;
-        gap: 12px;
-        margin-top: 24px;
-      }
-
-      .hero-point {
-        padding: 14px 16px;
-        border-radius: var(--radius-md);
-        background: rgba(255, 255, 255, 0.66);
-        border: 1px solid rgba(21, 34, 45, 0.08);
-      }
-
-      .hero-point strong {
-        display: block;
-        margin-bottom: 4px;
-      }
-
-      .hero-demo {
-        position: relative;
-        padding: 24px;
-        overflow: hidden;
-      }
-
-      .hero-demo::before {
-        content: "";
-        position: absolute;
-        inset: auto -120px -140px auto;
-        width: 260px;
-        height: 260px;
-        border-radius: 50%;
-        background: rgba(10, 147, 150, 0.16);
-        filter: blur(14px);
-      }
-
-      .mock-window {
-        position: relative;
-        border-radius: 24px;
-        background: #fffdf8;
-        border: 1px solid rgba(21, 34, 45, 0.08);
-        overflow: hidden;
-      }
-
-      .mock-topbar {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 16px 18px;
-        border-bottom: 1px solid rgba(21, 34, 45, 0.08);
-        background: #fff6ea;
-      }
-
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: #d8c9b4;
-      }
-
-      .mock-layout {
-        display: grid;
-        grid-template-columns: 1.25fr 0.95fr;
-      }
-
-      .doc-pane,
-      .side-pane {
-        padding: 22px 20px;
-      }
-
-      .doc-pane {
-        border-right: 1px solid rgba(21, 34, 45, 0.08);
-      }
-
-      .doc-title {
-        width: 72%;
-        height: 14px;
-        border-radius: 999px;
-        background: #183040;
-        margin-bottom: 18px;
-      }
-
-      .doc-line {
-        height: 9px;
-        border-radius: 999px;
-        background: rgba(21, 34, 45, 0.12);
-        margin-bottom: 10px;
-      }
-
-      .doc-line.short {
-        width: 62%;
-      }
-
-      .revision,
-      .comment-bubble {
-        margin-top: 18px;
-        padding: 14px 16px;
-        border-radius: 16px;
-      }
-
-      .revision {
-        border-left: 4px solid #1f9d55;
-        background: rgba(148, 210, 189, 0.2);
-      }
-
-      .comment-bubble {
-        border-left: 4px solid var(--warning);
-        background: rgba(202, 103, 2, 0.12);
-      }
-
-      .side-pane {
-        background: linear-gradient(180deg, rgba(0, 95, 115, 0.05), rgba(255, 255, 255, 0));
-      }
-
-      .tabs {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 14px;
-      }
-
-      .tabs span {
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: rgba(21, 34, 45, 0.06);
-        font-size: 0.88rem;
-      }
-
-      .tabs span.active {
-        background: rgba(0, 95, 115, 0.14);
-        color: var(--accent);
-        font-weight: 700;
-      }
-
-      .chat-bubble {
-        margin-bottom: 12px;
-        padding: 12px 14px;
-        border-radius: 16px;
-        line-height: 1.6;
-        font-size: 0.94rem;
-      }
-
-      .chat-bubble.user {
-        background: rgba(0, 95, 115, 0.08);
-      }
-
-      .chat-bubble.ai {
-        background: rgba(21, 34, 45, 0.06);
-      }
-
-      .section {
-        padding: 24px 0 8px;
-      }
-
-      .section-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        align-items: end;
-        margin-bottom: 18px;
-      }
-
-      .section-head h2 {
-        margin: 10px 0 0;
-        font-size: clamp(1.9rem, 4vw, 3rem);
-        line-height: 1.02;
-        font-family: Georgia, "Times New Roman", serif;
-      }
-
-      .section-head p {
-        margin: 0;
-        max-width: 640px;
+      .feat p {
         color: var(--muted);
         line-height: 1.7;
+        font-size: 0.95rem;
       }
 
-      .grid {
-        display: grid;
-        gap: 18px;
+      /* ── install ── */
+      .install {
+        padding: 32px 0;
       }
-
-      .grid.three {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+      .install h2 {
+        text-align: center;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+        letter-spacing: -0.03em;
+        margin-bottom: 20px;
       }
-
-      .grid.two {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .section-card {
-        padding: 24px;
-      }
-
-      .section-card h3 {
-        margin: 16px 0 10px;
-        font-size: 1.2rem;
-      }
-
-      .section-card p,
-      .section-card li {
-        color: var(--muted);
-        line-height: 1.7;
-      }
-
-      .section-card ul,
-      .section-card ol {
-        margin: 16px 0 0;
-        padding-left: 18px;
-      }
-
-      .metric {
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-      }
-
       .steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
         counter-reset: step;
       }
-
       .step {
         position: relative;
-        padding-left: 58px;
-        margin-bottom: 18px;
+        padding: 20px 18px 18px 18px;
+        border: 1px solid rgba(21, 34, 45, 0.08);
+        border-radius: var(--radius-xl);
+        background: var(--surface);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
       }
-
       .step::before {
         counter-increment: step;
         content: counter(step);
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 40px;
-        height: 40px;
         display: grid;
         place-items: center;
+        width: 32px; height: 32px;
         border-radius: 50%;
         background: rgba(0, 95, 115, 0.12);
         color: var(--accent);
         font-weight: 800;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
       }
+      .step strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
+      .step span { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+      .step a { color: var(--accent); }
 
-      .step strong {
-        display: block;
-        margin-bottom: 4px;
-      }
-
+      /* ── footer ── */
       .footer {
-        padding: 32px 0 56px;
-        color: var(--muted);
+        padding: 36px 0 52px;
         text-align: center;
+        color: var(--muted);
+        font-size: 0.92rem;
+        line-height: 1.7;
       }
+      .footer a { color: var(--accent); text-decoration: none; }
+      .footer a:hover { text-decoration: underline; }
 
-      @media (max-width: 980px) {
-        .hero,
-        .grid.three,
-        .grid.two,
-        .mock-layout {
-          grid-template-columns: 1fr;
-        }
-
-        .topbar,
-        .section-head {
-          flex-direction: column;
-          align-items: flex-start;
-        }
+      /* ── responsive ── */
+      @media (max-width: 820px) {
+        .features { grid-template-columns: 1fr; }
+        .steps { grid-template-columns: repeat(2, 1fr); }
       }
-
-      @media (max-width: 640px) {
-        .shell {
-          width: min(calc(100% - 20px), var(--max-width));
-        }
-
-        .hero-copy,
-        .hero-demo,
-        .section-card {
-          border-radius: 24px;
-        }
-
-        .hero-copy {
-          padding: 24px;
-        }
-
-        .hero-demo,
-        .section-card {
-          padding: 20px;
-        }
-
-        .mock-topbar,
-        .doc-pane,
-        .side-pane {
-          padding: 16px;
-        }
+      @media (max-width: 520px) {
+        .steps { grid-template-columns: 1fr; }
+        .topbar { flex-direction: column; align-items: flex-start; }
       }
     </style>
   </head>
@@ -474,184 +236,69 @@
           <span>Word Copilot</span>
         </div>
         <nav class="nav">
+          <a href="https://github.com/alphabetc1/word-copilot">GitHub</a>
           <a href="./word-copilot.xml">下载 Manifest</a>
           <a href="./en.html">English</a>
-          <a href="./CHANGELOG.md">更新记录</a>
         </nav>
       </header>
 
       <section class="hero">
-        <div class="hero-copy">
-          <span class="eyebrow">Microsoft Word add-in · AI revision workflow</span>
-          <h1>在 Word 里直接改稿，而不是来回复制粘贴</h1>
-          <p>
-            Word Copilot 把 AI 写作能力直接放进 Microsoft Word。
-            你可以选中文本后润色、翻译、加批注、做结构检查，并用 Word 修订模式保留每一处改动。
-          </p>
-          <p>
-            适合论文、临床报告、项目申报、公文等长文场景。配置自己的 API Key 即可使用，不依赖单独账号体系。
-          </p>
-          <div class="cta-group">
-            <a class="cta-primary" href="./word-copilot.xml">立即安装</a>
-            <a class="cta-secondary" href="#install">30 秒上手</a>
-          </div>
-          <div class="hero-points">
-            <div class="hero-point">
-              <strong>保留修订痕迹</strong>
-              所有改写都能走 Word Track Changes，审阅和协作更安全。
-            </div>
-            <div class="hero-point">
-              <strong>长文比聊天框更顺手</strong>
-              支持计划模式、结构检查和选区上下文处理，减少切窗口。
-            </div>
-            <div class="hero-point">
-              <strong>兼容 OpenAI 风格接口</strong>
-              可接 OpenAI、Azure OpenAI、通义千问及其他兼容服务。
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-demo">
-          <div class="mock-window">
-            <div class="mock-topbar">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </div>
-            <div class="mock-layout">
-              <div class="doc-pane">
-                <div class="doc-title"></div>
-                <div class="doc-line"></div>
-                <div class="doc-line"></div>
-                <div class="doc-line short"></div>
-                <div class="revision">
-                  <strong>修订建议</strong>
-                  将“研究方案比较新”改为“研究方案具备明确创新性与可验证路径”。
-                </div>
-                <div class="comment-bubble">
-                  <strong>结构提醒</strong>
-                  当前缺少“风险控制”和“里程碑计划”模块。
-                </div>
-              </div>
-              <div class="side-pane">
-                <div class="tabs">
-                  <span class="active">Chat</span>
-                  <span>Plan</span>
-                  <span>Settings</span>
-                </div>
-                <div class="chat-bubble user">润色选中段落，保持基金申请书语气。</div>
-                <div class="chat-bubble ai">
-                  已生成修订建议，并保留原文可接受/拒绝。需要我继续补一段技术路线吗？
-                </div>
-                <div class="chat-bubble user">检查整篇结构有没有缺章节。</div>
-                <div class="chat-bubble ai">
-                  检测到标题层级正常，但摘要与结论之间缺少方法和预期成果部分。
-                </div>
-              </div>
-            </div>
-          </div>
+        <span class="eyebrow">Microsoft Word Add-in · AI 改稿工作流</span>
+        <h1>在 Word 里直接改稿，不用来回复制粘贴</h1>
+        <p>
+          选中文本即可润色、翻译、加批注、做结构检查，所有改动通过 Word 修订模式保留。
+          配置自己的 API Key，即装即用。
+        </p>
+        <div class="cta-group">
+          <a class="cta-primary" href="./word-copilot.xml">立即安装</a>
+          <a class="cta-secondary" href="#install">30 秒上手 ↓</a>
+          <a class="cta-secondary" href="https://github.com/alphabetc1/word-copilot">查看源码</a>
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-head">
-          <div>
-            <span class="label">Why It Converts</span>
-            <h2>这个项目最适合传播的，不是“大模型”，而是“工作流”</h2>
-          </div>
-          <p>
-            多数 AI 写作工具停留在聊天框。Word Copilot 的传播点更直接：保留修订、右键即用、长文友好、用户自带 API Key。
-          </p>
-        </div>
-        <div class="grid three">
-          <article class="section-card">
-            <div class="metric">01</div>
-            <h3>选区即上下文</h3>
-            <p>右键润色、翻译、加批注，不需要把段落复制到外部网站再贴回来。</p>
-          </article>
-          <article class="section-card">
-            <div class="metric">02</div>
-            <h3>审稿可控</h3>
-            <p>通过 Word 修订模式写回文档，更适合导师反馈、团队协作和正式文档审阅。</p>
-          </article>
-          <article class="section-card">
-            <div class="metric">03</div>
-            <h3>长文场景更强</h3>
-            <p>计划模式可先出大纲再逐段写，结构检查能直接指出缺失章节和层级问题。</p>
-          </article>
-        </div>
-      </section>
+      <div class="features">
+        <article class="feat">
+          <h3>🔄 修订写回</h3>
+          <p>AI 改写通过 Track Changes 写入文档，可逐条接受或拒绝，审阅协作更安全。</p>
+        </article>
+        <article class="feat">
+          <h3>⚡ 右键即用</h3>
+          <p>润色、翻译、批注、结构分析，选中文本右键直接触发，不需要切窗口。</p>
+        </article>
+        <article class="feat">
+          <h3>📊 长文友好</h3>
+          <p>计划模式先出大纲再逐段写，结构检查能指出缺失章节和层级问题。</p>
+        </article>
+      </div>
 
-      <section class="section" id="install">
-        <div class="section-head">
-          <div>
-            <span class="label">Quick Start</span>
-            <h2>30 秒上手</h2>
+      <section class="install" id="install">
+        <h2>30 秒上手</h2>
+        <div class="steps">
+          <div class="step">
+            <strong>下载 Manifest</strong>
+            <span>保存 <a href="./word-copilot.xml">word-copilot.xml</a> 到本地</span>
           </div>
-          <p>如果你已经有可用的 API Key，实际安装过程只需要一次 manifest 上传和一次模型配置。</p>
-        </div>
-        <div class="grid two">
-          <article class="section-card steps">
-            <div class="step">
-              <strong>下载 Manifest</strong>
-              打开 <a href="./word-copilot.xml">`word-copilot.xml`</a> 并保存到本地。
-            </div>
-            <div class="step">
-              <strong>加载到 Word</strong>
-              在 Word 中依次点击“插入 → 加载项 → 我的加载项 → 上传我的加载项”。
-            </div>
-            <div class="step">
-              <strong>配置模型</strong>
-              在插件设置中填写 `Base URL`、`API Key`、`Model` 并保存。
-            </div>
-            <div class="step">
-              <strong>开始改稿</strong>
-              选中文本后使用右键菜单，或直接在侧边栏输入指令。
-            </div>
-          </article>
-          <article class="section-card">
-            <span class="label">Best Fit</span>
-            <h3>优先从这些用户群切入</h3>
-            <ul>
-              <li>科研/论文写作：需要润色、翻译、结构检查、可追踪修订。</li>
-              <li>临床和医学文档：强调措辞规范、批注建议、章节完整性。</li>
-              <li>项目申报和公文：长文规划、措辞统一、版本审阅链路明确。</li>
-            </ul>
-            <p>
-              如果你要做传播，优先只打一个细分人群，先把“谁会立即安装”打透，再扩到其他场景。
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-head">
-          <div>
-            <span class="label">Feature Set</span>
-            <h2>核心能力</h2>
+          <div class="step">
+            <strong>加载到 Word</strong>
+            <span>插入 → 加载项 → 我的加载项 → 上传我的加载项</span>
           </div>
-          <p>这些功能都是当前仓库已经具备的，不需要额外后端即可演示和分发。</p>
-        </div>
-        <div class="grid three">
-          <article class="section-card">
-            <h3>修订写回</h3>
-            <p>替换选中文本时可启用 Track Changes，用户可以在 Word 内接受或拒绝 AI 修改。</p>
-          </article>
-          <article class="section-card">
-            <h3>右键快捷命令</h3>
-            <p>润色、翻译、添加批注、结构分析都能从上下文菜单直接触发。</p>
-          </article>
-          <article class="section-card">
-            <h3>计划模式</h3>
-            <p>先收集问题，再生成大纲，再逐节生成正文，适合项目书和长报告。</p>
-          </article>
+          <div class="step">
+            <strong>配置模型</strong>
+            <span>填写 Base URL、API Key、Model 并保存</span>
+          </div>
+          <div class="step">
+            <strong>开始改稿</strong>
+            <span>选中文本右键，或在侧边栏输入指令</span>
+          </div>
         </div>
       </section>
 
       <footer class="footer">
         <p>
-          需要完整安装说明或开发命令，请查看仓库内的 README。分发时建议统一把流量导向这个页面和
-          <a href="./word-copilot.xml">manifest 下载地址</a>。
+          支持 OpenAI / Azure OpenAI / 通义千问及其他兼容接口 · Apache 2.0 开源协议<br />
+          <a href="https://github.com/alphabetc1/word-copilot">GitHub</a> ·
+          <a href="./CHANGELOG.md">更新记录</a> ·
+          <a href="./en.html">English</a>
         </p>
       </footer>
     </div>
