@@ -4,12 +4,15 @@
 <h1 align="center">Word Copilot</h1>
 
 <p align="center">
-  <strong>🤖 AI-Powered Intelligent Writing Assistant for Word</strong><br>
-  Built with Office.js, seamlessly integrating LLM APIs to boost your writing productivity
+  <strong>Use AI directly inside Microsoft Word and keep every revision reviewable</strong><br>
+  Built with Office.js for academic papers, clinical writing, grant proposals, and other long-form documents
 </p>
 
 <p align="center">
-  <b>English</b> | <a href="./README.md">简体中文</a>
+  <a href="https://alphabetc1.github.io/word-copilot/en.html">Landing Page</a> ·
+  <a href="https://alphabetc1.github.io/word-copilot/word-copilot.xml">Download Manifest</a> ·
+  <a href="./CHANGELOG.md">Changelog</a> ·
+  <b>English</b> · <a href="./README.md">简体中文</a>
 </p>
 
 <p align="center">
@@ -19,6 +22,28 @@
 </p>
 
 ---
+
+## Why This Repo Converts Better
+
+- **It works inside Word**: no more copying text between your document and a separate AI chat app.
+- **Edits stay reviewable**: Track Changes lets teams accept or reject AI revisions in a familiar workflow.
+- **It supports long documents**: plan mode and structure checks are stronger than plain chat-based editing.
+- **Trial friction is low**: users bring their own API key instead of creating another SaaS account.
+
+## Understand It In 30 Seconds
+
+1. Download [word-copilot.xml](https://alphabetc1.github.io/word-copilot/word-copilot.xml)
+2. In Word, open **Insert → Add-ins → My Add-ins → Upload My Add-in**
+3. Enter `Base URL`, `API Key`, and `Model`
+4. Start with the sidebar or the right-click menu on selected text
+
+## Best First Audiences
+
+| Audience | Main Job | Why They Install |
+|----------|----------|------------------|
+| Academic writing | polish, translate, structure review, supervisor feedback | They need reviewable revisions without leaving Word |
+| Clinical and medical docs | precise wording, comments, section completeness | They value rigor and formal review workflows |
+| Grant proposals and office docs | long-form planning, consistent tone, iterative drafts | They want faster revision cycles in the same document |
 
 ## ✨ Features
 
@@ -31,6 +56,14 @@
 | 📊 **Structure Check** | AI analyzes document structure, heading hierarchy, citations |
 | 💾 **Session Management** | Multiple independent conversations with local history |
 | 🌐 **i18n** | Full English and Chinese language support |
+
+## 🎬 Demo Assets To Prioritize
+
+If you plan to promote the project, record these three short clips first:
+
+1. **Select text → right-click polish → Track Changes appears in Word**
+2. **Plan mode → answer a few questions → generate an outline**
+3. **Structure check → highlight missing sections and hierarchy issues**
 
 ## 🚀 Quick Start
 

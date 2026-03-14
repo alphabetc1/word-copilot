@@ -74,6 +74,16 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      template: "./src/site/index.html",
+      filename: "index.html",
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
+      template: "./src/site/en.html",
+      filename: "en.html",
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
       template: "./src/taskpane/index.html",
       filename: "taskpane.html",
       chunks: ["taskpane"],
@@ -93,6 +103,19 @@ module.exports = {
         {
           from: "word-copilot-local.xml",
           to: "word-copilot-local.xml",
+        },
+        {
+          from: "README.md",
+          to: "README.md",
+        },
+        {
+          from: "README.en.md",
+          to: "README.en.md",
+        },
+        {
+          from: "CHANGELOG.md",
+          to: "CHANGELOG.md",
+          noErrorOnMissing: true,
         },
       ],
     }),

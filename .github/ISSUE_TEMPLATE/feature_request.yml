@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest a product, UX, or developer workflow improvement
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Explain the workflow pain point first.
+      placeholder: Users working on grant proposals need a faster way to regenerate only one outline section.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or behavior you want.
+      placeholder: Add a "regenerate section" action inside plan mode with a custom prompt field.
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Expected impact
+      description: Who benefits and how?
+      placeholder: This would make long-form iteration faster for proposal writers and reduce copy-paste edits.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Mention existing workarounds or related tools if relevant.

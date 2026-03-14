@@ -1,0 +1,63 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test -- --coverage --passWithNoTests
+
+      - name: Build production bundle
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Generate production manifest
+        run: |
+          PAGES_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+          echo "Building release manifest for: $PAGES_URL"
+          sed "s|https://localhost:3000|${PAGES_URL}|g" word-copilot-local.xml > dist/word-copilot.xml
+
+      - name: Copy public assets
+        run: |
+          cp -r assets dist/
+          cp CHANGELOG.md dist/CHANGELOG.md
+          node scripts/generate-icons.js
+          mv assets/icon-*.png dist/assets/
+
+      - name: Create release archive
+        run: |
+          cd dist
+          zip -r ../word-copilot-pages.zip .
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/word-copilot.xml
+            word-copilot-pages.zip
+          generate_release_notes: true

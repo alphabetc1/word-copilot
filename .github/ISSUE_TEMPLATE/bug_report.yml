@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a reproducible problem in Word Copilot
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the problem and the expected behavior.
+      placeholder: When I try to polish selected text, the add-in returns an API error instead of updating the document.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps so the issue can be reproduced.
+      placeholder: |
+        1. Open Word on macOS
+        2. Load the production manifest
+        3. Select a paragraph
+        4. Run "Polish Selection"
+        5. Observe the error
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include platform, Word version, and API provider.
+      placeholder: macOS 15, Word 16.x, OpenAI-compatible endpoint, Chrome-based WebView
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Paste console errors, screenshots, or anything else useful.
+      placeholder: Console output, task pane screenshot, or manifest validation result
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any extra context that may help diagnose the issue.

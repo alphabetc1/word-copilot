@@ -4,12 +4,16 @@
 <h1 align="center">Word Copilot</h1>
 
 <p align="center">
-  <strong>🤖 AI 驱动的 Word 智能写作助手</strong><br>
-  基于 Office.js 构建，无缝集成大模型 API，让你的写作更高效
+  <strong>在 Microsoft Word 里直接调用 AI 修改文稿，并保留修订痕迹</strong><br>
+  基于 Office.js 构建，适合论文、临床报告、项目申报、公文等长文写作场景
 </p>
 
 <p align="center">
-  <a href="./README.en.md">English</a> | <b>简体中文</b>
+  <a href="https://alphabetc1.github.io/word-copilot/">在线主页</a> ·
+  <a href="https://alphabetc1.github.io/word-copilot/word-copilot.xml">下载 Manifest</a> ·
+  <a href="./CHANGELOG.md">更新记录</a> ·
+  <a href="./README.en.md">English</a> ·
+  <b>简体中文</b>
 </p>
 
 <p align="center">
@@ -19,6 +23,28 @@
 </p>
 
 ---
+
+## 为什么这个项目更容易被采用
+
+- **直接在 Word 内完成改稿**：不用在 Word 和聊天框之间来回复制粘贴。
+- **保留 Word 修订痕迹**：AI 生成的修改可以接受或拒绝，更适合正式审阅流程。
+- **长文工作流比聊天框更完整**：除了对话，还有计划模式和结构检查。
+- **试用门槛低**：用户只需要自己的 API Key，不需要额外注册独立 SaaS 账号。
+
+## 30 秒看懂
+
+1. 下载 [word-copilot.xml](https://alphabetc1.github.io/word-copilot/word-copilot.xml)
+2. 在 Word 中点击 **插入 → 加载项 → 我的加载项 → 上传我的加载项**
+3. 在设置里填入 `Base URL`、`API Key` 和 `Model`
+4. 选中文本后右键，或在侧边栏直接输入指令
+
+## 适合优先切入的人群
+
+| 人群 | 典型需求 | 为什么会装 |
+|------|----------|------------|
+| 科研/论文写作 | 润色、翻译、结构检查、导师审阅 | 需要保留修订，不想破坏原稿 |
+| 临床/医学文档 | 用词规范、批注建议、章节完整性 | 关注严谨表达和审稿流程 |
+| 项目申报/公文 | 长文规划、措辞统一、快速改稿 | 更看重在 Word 里直接完成版本迭代 |
 
 ## ✨ 功能亮点
 
@@ -30,6 +56,14 @@
 | ⚡ **快捷命令** | 右键菜单一键润色、翻译、添加批注 |
 | 📊 **结构检查** | AI 分析文档结构，检查标题层级、引用规范等 |
 | 💾 **多会话管理** | 支持多个独立对话，历史记录本地保存 |
+
+## 🎬 对外演示建议
+
+如果你准备推广，优先录这三段短视频或 GIF：
+
+1. **选中文本 → 右键润色 → Word 中显示修订**
+2. **计划模式 → 回答问题 → 自动生成大纲**
+3. **结构检查 → 提示缺失章节和层级问题**
 
 ## 🚀 快速开始
 
