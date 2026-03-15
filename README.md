@@ -68,11 +68,11 @@
      - **macOS**
        - 下载脚本：[install-sideload-mac.sh](scripts/install-sideload-mac.sh)
        - 直接执行：`bash ./scripts/install-sideload-mac.sh`
-       - 脚本会自动下载最新 `word-copilot.xml` 并复制到 `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
+       - 脚本会优先使用当前目录/仓库里的 `word-copilot.xml`；如果本地没有，再自动下载并复制到 `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
      - **Windows**
        - 下载脚本：[install-sideload-windows.cmd](scripts/install-sideload-windows.cmd) / [install-sideload-windows.ps1](scripts/install-sideload-windows.ps1)
        - 直接执行：`.\scripts\install-sideload-windows.cmd`
-       - 脚本会自动下载最新 `word-copilot.xml`，复制到 `%USERPROFILE%\Documents\OfficeAddinManifests\`，共享目录并写入 Trusted Catalog
+       - 脚本会优先使用当前目录/仓库里的 `word-copilot.xml`；如果本地没有，再自动下载，复制到 `%USERPROFILE%\Documents\OfficeAddinManifests\`，共享目录并写入 Trusted Catalog
        - **注意**：按 Microsoft 官方机制，Windows 首次仍需在 Word 中点一次：`插入 → 加载项 → 我的加载项 → SHARED FOLDER → Word Copilot → 添加`
      - **脚本不可用时的手动目录**
        - macOS：`~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`

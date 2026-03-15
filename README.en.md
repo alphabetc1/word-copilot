@@ -84,11 +84,11 @@ Use the pre-built version hosted on GitHub Pages:
      - **macOS**
        - Download: [install-sideload-mac.sh](scripts/install-sideload-mac.sh)
        - Run: `bash ./scripts/install-sideload-mac.sh`
-       - The script downloads the latest `word-copilot.xml` and copies it to `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
+       - The script first uses a local `word-copilot.xml` from the repo/current directory; if none is found, it downloads one and copies it to `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
      - **Windows**
        - Download: [install-sideload-windows.cmd](scripts/install-sideload-windows.cmd) / [install-sideload-windows.ps1](scripts/install-sideload-windows.ps1)
        - Run: `.\scripts\install-sideload-windows.cmd`
-       - The script downloads the latest manifest, copies it to `%USERPROFILE%\Documents\OfficeAddinManifests\`, shares the folder, and registers a Trusted Catalog
+       - The script first uses a local `word-copilot.xml` from the repo/current directory; if none is found, it downloads one, copies it to `%USERPROFILE%\Documents\OfficeAddinManifests\`, shares the folder, and registers a Trusted Catalog
        - **Note**: due to Microsoft's shared-folder flow, the first load on Windows still requires `Insert -> Add-ins -> My Add-ins -> SHARED FOLDER -> Word Copilot -> Add`
      - **Manual fallback paths**
        - macOS: `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`

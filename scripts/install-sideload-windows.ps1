@@ -8,6 +8,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$ScriptDir = Split-Path -Parent $PSCommandPath
+$FallbackManifestUrls = @(
+  "https://raw.githubusercontent.com/alphabetc1/word-copilot/main/word-copilot.xml"
+)
 
 function Get-ManifestSource {
   param(
@@ -20,10 +24,32 @@ function Get-ManifestSource {
     return $resolved.Path
   }
 
+  $localCandidates = @(
+    (Join-Path $ScriptDir "..\word-copilot.xml"),
+    (Join-Path (Get-Location) "word-copilot.xml")
+  )
+
+  foreach ($candidate in $localCandidates) {
+    if (Test-Path -Path $candidate -PathType Leaf) {
+      $resolved = Resolve-Path -Path $candidate -ErrorAction Stop
+      Write-Host "Using local manifest: $($resolved.Path)"
+      return $resolved.Path
+    }
+  }
+
   $tempPath = Join-Path $env:TEMP "word-copilot.xml"
-  Write-Host "Downloading manifest from: $SourceUrl"
-  Invoke-WebRequest -Uri $SourceUrl -UseBasicParsing -OutFile $tempPath
-  return $tempPath
+  $candidateUrls = @($SourceUrl) + $FallbackManifestUrls
+  foreach ($url in $candidateUrls) {
+    try {
+      Write-Host "Downloading manifest from: $url"
+      Invoke-WebRequest -Uri $url -UseBasicParsing -OutFile $tempPath
+      return $tempPath
+    } catch {
+      Write-Warning "Download failed: $url"
+    }
+  }
+
+  throw "Failed to download manifest from all known URLs. If you already cloned the repo, run with -ManifestPath .\word-copilot.xml"
 }
 
 function Test-Manifest {

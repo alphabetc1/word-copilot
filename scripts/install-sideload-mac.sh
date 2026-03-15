@@ -2,8 +2,12 @@
 set -euo pipefail
 
 DEFAULT_MANIFEST_URL="https://alphabetc1.github.io/word-copilot/word-copilot.xml"
+FALLBACK_MANIFEST_URLS=(
+  "https://raw.githubusercontent.com/alphabetc1/word-copilot/main/word-copilot.xml"
+)
 manifest_url="$DEFAULT_MANIFEST_URL"
 manifest_path=""
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
   cat <<'EOF'
@@ -12,6 +16,41 @@ Usage:
   bash scripts/install-sideload-mac.sh --manifest /path/to/word-copilot.xml
   bash scripts/install-sideload-mac.sh --manifest-url https://example.com/word-copilot.xml
 EOF
+}
+
+resolve_local_manifest() {
+  local candidates=(
+    "$script_dir/../word-copilot.xml"
+    "$(pwd)/word-copilot.xml"
+  )
+
+  local candidate=""
+  for candidate in "${candidates[@]}"; do
+    if [[ -f "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+download_manifest() {
+  local destination="$1"
+  local url=""
+  local urls=("$manifest_url" "${FALLBACK_MANIFEST_URLS[@]}")
+
+  for url in "${urls[@]}"; do
+    echo "Downloading manifest from: $url"
+    if curl -fsSL --connect-timeout 15 --max-time 60 "$url" -o "$destination"; then
+      return 0
+    fi
+    echo "Download failed: $url" >&2
+  done
+
+  echo "Failed to download manifest from all known URLs." >&2
+  echo "Tip: if you already cloned the repo, run:" >&2
+  echo "  bash scripts/install-sideload-mac.sh --manifest ./word-copilot.xml" >&2
+  return 1
 }
 
 while [[ $# -gt 0 ]]; do
@@ -69,9 +108,11 @@ if [[ -n "$manifest_path" ]]; then
     exit 1
   fi
   cp "$manifest_path" "$tmp_manifest"
+elif local_manifest="$(resolve_local_manifest)"; then
+  echo "Using local manifest: $local_manifest"
+  cp "$local_manifest" "$tmp_manifest"
 else
-  echo "Downloading manifest from: $manifest_url"
-  curl -fsSL "$manifest_url" -o "$tmp_manifest"
+  download_manifest "$tmp_manifest"
 fi
 
 if ! grep -q "<OfficeApp" "$tmp_manifest"; then
