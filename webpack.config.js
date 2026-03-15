@@ -105,6 +105,18 @@ module.exports = {
           to: "word-copilot-local.xml",
         },
         {
+          from: "scripts/install-sideload-mac.sh",
+          to: "scripts/install-sideload-mac.sh",
+        },
+        {
+          from: "scripts/install-sideload-windows.ps1",
+          to: "scripts/install-sideload-windows.ps1",
+        },
+        {
+          from: "scripts/install-sideload-windows.cmd",
+          to: "scripts/install-sideload-windows.cmd",
+        },
+        {
           from: "README.md",
           to: "README.md",
         },

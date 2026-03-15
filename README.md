@@ -64,18 +64,19 @@
 1. **下载 manifest 文件**：[点击这里下载 word-copilot.xml](https://alphabetc1.github.io/word-copilot/word-copilot.xml)（右键 → 另存为）
 2. **安装到 Word（两种方式二选一）**
    - **A. 手动上传（推荐）**：Word → **插入 → 加载项 → 我的加载项 → 上传我的加载项** → 选择下载的 `word-copilot.xml`
-   - **B. 手动sideload（当“上传我的加载项”不可用/被禁用时）**
-     - **macOS（固定目录 sideload）**
-       - 将下载好的`word-copilot.xml`拷贝到 **目标目录**：`~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
-
-     - **Windows（Shared Folder Catalog sideload）**
-       - 将下载好的`word-copilot.xml`拷贝到 **目标目录**：`%USERPROFILE%\Documents\OfficeAddinManifests\word-copilot.xml`
-     - 共享文件夹（截图式步骤）：
-       - 右键文件夹 → 属性 → 共享 → 共享 → 选择 `Everyone` → 权限选 **读取**
-       - 记录共享路径：`\\你的电脑名\OfficeAddinManifests`
-     - Trusted Catalog（截图式步骤）：
-       - Word → 文件 → 选项 → 信任中心 → 信任中心设置
-       - 受信任的加载项目录 → 添加 `\\你的电脑名\OfficeAddinManifests` → 勾选允许
+   - **B. 一键 sideload 脚本（当“上传我的加载项”不可用/被禁用时）**
+     - **macOS**
+       - 下载脚本：[install-sideload-mac.sh](scripts/install-sideload-mac.sh)
+       - 直接执行：`bash ./scripts/install-sideload-mac.sh`
+       - 脚本会自动下载最新 `word-copilot.xml` 并复制到 `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
+     - **Windows**
+       - 下载脚本：[install-sideload-windows.cmd](scripts/install-sideload-windows.cmd) / [install-sideload-windows.ps1](scripts/install-sideload-windows.ps1)
+       - 直接执行：`.\scripts\install-sideload-windows.cmd`
+       - 脚本会自动下载最新 `word-copilot.xml`，复制到 `%USERPROFILE%\Documents\OfficeAddinManifests\`，共享目录并写入 Trusted Catalog
+       - **注意**：按 Microsoft 官方机制，Windows 首次仍需在 Word 中点一次：`插入 → 加载项 → 我的加载项 → SHARED FOLDER → Word Copilot → 添加`
+     - **脚本不可用时的手动目录**
+       - macOS：`~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
+       - Windows：`%USERPROFILE%\Documents\OfficeAddinManifests\word-copilot.xml`
 3. 完全退出 Word (Cmd+Q) 并重新打开
 4. 在 Word 中：插入 → 加载项 → 我的加载项，找到 **Word Copilot**
 5. 在插件设置中配置你的 API Key，点击保存
@@ -118,6 +119,16 @@ npm install
 
 # 2️⃣ 将插件 sideload 到 Word
 npm run sideload:windows
+```
+
+如果你只是想安装 GitHub Pages 托管版，也可以直接远程执行脚本而不手动下载 manifest：
+
+```bash
+curl -fsSL https://alphabetc1.github.io/word-copilot/scripts/install-sideload-mac.sh | bash
+```
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$p = Join-Path $env:TEMP 'word-copilot-install.ps1'; Invoke-WebRequest 'https://alphabetc1.github.io/word-copilot/scripts/install-sideload-windows.ps1' -UseBasicParsing -OutFile $p; & $p"
 ```
 
 ### 本地调试（可选）

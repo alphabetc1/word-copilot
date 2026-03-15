@@ -80,24 +80,21 @@ Use the pre-built version hosted on GitHub Pages:
 1. **Download manifest file**: [Click here to download word-copilot.xml](https://alphabetc1.github.io/word-copilot/word-copilot.xml) (right-click → Save As)
 2. Install into Word (choose one):
    - **A. Upload (recommended)**: Word → **Insert → Add-ins → My Add-ins → Upload My Add-in** → select `word-copilot.xml`
-   - **B. Sideload (when Upload is disabled by policy)**
-     - **macOS**: copy to:
-       - Folder: `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
-       - File: `word-copilot.xml`
+   - **B. One-click sideload scripts (when Upload is disabled by policy)**
+     - **macOS**
+       - Download: [install-sideload-mac.sh](scripts/install-sideload-mac.sh)
+       - Run: `bash ./scripts/install-sideload-mac.sh`
+       - The script downloads the latest `word-copilot.xml` and copies it to `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
+     - **Windows**
+       - Download: [install-sideload-windows.cmd](scripts/install-sideload-windows.cmd) / [install-sideload-windows.ps1](scripts/install-sideload-windows.ps1)
+       - Run: `.\scripts\install-sideload-windows.cmd`
+       - The script downloads the latest manifest, copies it to `%USERPROFILE%\Documents\OfficeAddinManifests\`, shares the folder, and registers a Trusted Catalog
+       - **Note**: due to Microsoft's shared-folder flow, the first load on Windows still requires `Insert -> Add-ins -> My Add-ins -> SHARED FOLDER -> Word Copilot -> Add`
+     - **Manual fallback paths**
+       - macOS: `~/Library/Containers/com.microsoft.Word/Data/Documents/wef/`
+       - Windows: `%USERPROFILE%\Documents\OfficeAddinManifests\word-copilot.xml`
 
-```bash
-npm run sideload:mac -- word-copilot.xml
-```
-
-     - **Windows** (Shared Folder Catalog): the script copies to:
-       - `%USERPROFILE%\\Documents\\OfficeAddinManifests\\word-copilot.xml`
-       - then follow Trust Center → Trusted Add-in Catalogs → SHARED FOLDER steps printed by the script
-
-```bash
-npm run sideload:windows -- word-copilot.xml
-```
-
-4. Configure your API key in the add-in settings
+3. Configure your API key in the add-in settings
 
 > **If you forked this repo**, use your own GitHub Pages URL: `https://<your-username>.github.io/word-copilot/word-copilot.xml`
 
@@ -129,6 +126,16 @@ npm install
 
 # 2️⃣ Sideload to Word (default uses production manifest: word-copilot.xml)
 npm run sideload:windows
+```
+
+If you only want the GitHub Pages hosted manifest, you can also run the installer scripts directly:
+
+```bash
+curl -fsSL https://alphabetc1.github.io/word-copilot/scripts/install-sideload-mac.sh | bash
+```
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$p = Join-Path $env:TEMP 'word-copilot-install.ps1'; Invoke-WebRequest 'https://alphabetc1.github.io/word-copilot/scripts/install-sideload-windows.ps1' -UseBasicParsing -OutFile $p; & $p"
 ```
 
 ### Local Debugging (Optional)

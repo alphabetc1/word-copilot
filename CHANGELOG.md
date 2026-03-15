@@ -11,6 +11,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - GitHub Pages landing pages in Chinese and English for promotion and onboarding.
 - Release workflow that builds the production manifest and uploads release assets on version tags.
 - Issue templates for bug reports and feature requests.
+- One-click sideload installer scripts for macOS and Windows shared-folder setup.
 
 ### Changed
 
