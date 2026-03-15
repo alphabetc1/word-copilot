@@ -12,6 +12,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Release workflow that builds the production manifest and uploads release assets on version tags.
 - Issue templates for bug reports and feature requests.
 - One-click sideload installer scripts for macOS and Windows shared-folder setup.
+- One-click local run scripts that build, sideload, and serve the add-in from `https://localhost:3000`.
+- Local runtime now auto-selects a free high port, runs in the background, and supports stop/status commands.
 
 ### Changed
 

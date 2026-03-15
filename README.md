@@ -59,7 +59,59 @@
 
 ## 兼容性更广的安装方案（部分Word版本不支持手动上传加载项）
 
-### 方式一：基于GitHub Pages
+### 方式一：完全本地运行（不依赖 GitHub）
+
+如果用户已经拿到仓库，但网络环境无法稳定访问 GitHub，可以直接本地启动：
+
+```bash
+bash scripts/start-local-mac.sh
+```
+
+```powershell
+.\scripts\start-local-windows.cmd
+```
+
+这个脚本会自动完成：
+
+1. 安装 npm 依赖
+2. 安装 localhost 开发证书
+3. 构建本地前端到 `dist/`
+4. 自动探测空闲端口（从 `38300` 开始，冲突就顺延）
+5. 生成对应端口的本地 manifest 并 sideload
+6. 在后台常驻启动本地 HTTPS 服务
+
+注意：
+
+- 首次运行会比较慢，因为要执行 `npm install`
+- macOS 需要在脚本跑完后完全退出 Word 再重开
+- Windows 首次仍需在 Word 中点一次 `SHARED FOLDER -> Add`
+- 后台日志保存在 `.word-copilot-local/server.log`
+
+常用命令：
+
+```bash
+# 启动
+bash scripts/start-local-mac.sh
+
+# 查看状态
+bash scripts/start-local-mac.sh status
+
+# 终止后台服务
+bash scripts/start-local-mac.sh stop
+```
+
+```powershell
+# 启动
+.\scripts\start-local-windows.cmd
+
+# 查看状态
+.\scripts\start-local-windows.cmd status
+
+# 终止后台服务
+.\scripts\start-local-windows.cmd stop
+```
+
+### 方式二：基于GitHub Pages
 
 1. **下载 manifest 文件**：[点击这里下载 word-copilot.xml](https://alphabetc1.github.io/word-copilot/word-copilot.xml)（右键 → 另存为）
 2. **安装到 Word（两种方式二选一）**
@@ -81,7 +133,7 @@
 4. 在 Word 中：插入 → 加载项 → 我的加载项，找到 **Word Copilot**
 5. 在插件设置中配置你的 API Key，点击保存
 
-### 方式二：本地安装（Mac）
+### 方式三：本地安装（Mac）
 
 ```bash
 # 如果没有 npm，需要下载并安装 node.js
@@ -109,7 +161,7 @@ npm run sideload:mac
 # - 或：选中文本后右键 → 「Word Copilot」
 ```
 
-### 方式三：本地安装（Windows）
+### 方式四：本地安装（Windows）
 
 ```bash
 # 1️⃣ 克隆项目并安装依赖

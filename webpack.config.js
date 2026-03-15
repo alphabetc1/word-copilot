@@ -117,6 +117,26 @@ module.exports = {
           to: "scripts/install-sideload-windows.cmd",
         },
         {
+          from: "scripts/local-https-server.js",
+          to: "scripts/local-https-server.js",
+        },
+        {
+          from: "scripts/local-runtime.js",
+          to: "scripts/local-runtime.js",
+        },
+        {
+          from: "scripts/start-local-mac.sh",
+          to: "scripts/start-local-mac.sh",
+        },
+        {
+          from: "scripts/start-local-windows.ps1",
+          to: "scripts/start-local-windows.ps1",
+        },
+        {
+          from: "scripts/start-local-windows.cmd",
+          to: "scripts/start-local-windows.cmd",
+        },
+        {
           from: "README.md",
           to: "README.md",
         },

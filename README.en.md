@@ -73,7 +73,59 @@ If you plan to promote the project, record these three short clips first:
 - Microsoft Word 2016+ (Windows/Mac) or Word Online
 - An LLM API Key (OpenAI, Azure, Alibaba Cloud Qwen, etc.)
 
-### Option 1: GitHub Pages (Easiest - No Local Setup)
+### Option 1: Fully Local Run (No GitHub Required)
+
+If the user already has the repo but cannot reliably access GitHub, run everything locally:
+
+```bash
+bash scripts/start-local-mac.sh
+```
+
+```powershell
+.\scripts\start-local-windows.cmd
+```
+
+This flow automatically:
+
+1. Installs npm dependencies
+2. Installs localhost dev certificates
+3. Builds the local frontend into `dist/`
+4. Probes for a free port starting from `38300`
+5. Generates and sideloads a runtime manifest for that port
+6. Starts a background local HTTPS server
+
+Notes:
+
+- The first run can take a while because it runs `npm install`
+- On macOS, fully quit and reopen Word after sideload
+- On Windows, the first load still requires `SHARED FOLDER -> Add`
+- Background logs are written to `.word-copilot-local/server.log`
+
+Useful commands:
+
+```bash
+# Start
+bash scripts/start-local-mac.sh
+
+# Status
+bash scripts/start-local-mac.sh status
+
+# Stop
+bash scripts/start-local-mac.sh stop
+```
+
+```powershell
+# Start
+.\scripts\start-local-windows.cmd
+
+# Status
+.\scripts\start-local-windows.cmd status
+
+# Stop
+.\scripts\start-local-windows.cmd stop
+```
+
+### Option 2: GitHub Pages (Easiest - No Local Setup)
 
 Use the pre-built version hosted on GitHub Pages:
 
@@ -98,7 +150,7 @@ Use the pre-built version hosted on GitHub Pages:
 
 > **If you forked this repo**, use your own GitHub Pages URL: `https://<your-username>.github.io/word-copilot/word-copilot.xml`
 
-### Option 2: Local Install (Mac)
+### Option 3: Local Install (Mac)
 
 ```bash
 # Check Node.js installation
@@ -116,7 +168,7 @@ npm run sideload:mac
 # 4️⃣ Ribbon: look for the "Word Copilot" tab
 ```
 
-### Option 3: Local Install (Windows)
+### Option 4: Local Install (Windows)
 
 ```bash
 # 1️⃣ Clone and install dependencies
